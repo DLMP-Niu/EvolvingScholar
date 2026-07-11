@@ -83,6 +83,11 @@ def build_review_packet(run_dir: str | Path) -> dict[str, Path]:
                 "reviewer": "owner",
                 "scores": {d: {"score": None, "note": ""} for d in REVIEW_DIMENSIONS},
                 "directives": [{"q_id": q["q_id"], "directive": ""} for q in questions],
+                # Iterative within-cycle review (ADR-0013): set status to 'needs_more'
+                # and list new_tasks to send the Scholar back for a partial re-run;
+                # set 'complete' when the project is done and ready for Loop C.
+                "status": "needs_more",
+                "new_tasks": [],
                 "overall_note": "",
             }
         }
@@ -102,6 +107,20 @@ def load_feedback(run_dir: str | Path) -> dict[str, Any]:
     if not filled:
         raise ValueError(f"feedback not filled — every score is null in {fb_path}")
     return fb
+
+
+def pending_tasks(run_dir: str | Path) -> list[str] | None:
+    """The PI's newly-assigned tasks if the within-cycle review asked for more work
+    (status: needs_more), else None (project complete / no tasks). Drives
+    `loop_a.py --continue` (ADR-0013)."""
+    fb_path = Path(run_dir) / "feedback_project.yaml"
+    if not fb_path.exists():
+        return None
+    review = (yaml.safe_load(fb_path.read_text()) or {}).get("review", {})
+    if review.get("status") != "needs_more":
+        return None
+    tasks = [t for t in (review.get("new_tasks") or []) if str(t).strip()]
+    return tasks or None
 
 
 if __name__ == "__main__":

@@ -56,7 +56,9 @@ class RunContext:
         self.actions = JsonlWriter(self.run_dir / "actions.jsonl")       # layer 3
         self.thinking = JsonlWriter(self.run_dir / "thinking.jsonl")     # layer 2
         self.transcript = JsonlWriter(self.run_dir / "transcript.jsonl") # layer 1
-        self._qn = 0
+        # Restore the question counter so a --continue run keeps incrementing ids.
+        qf = self.run_dir / "questions.jsonl"
+        self._qn = sum(1 for _ in qf.open(encoding="utf-8")) if qf.exists() else 0
 
     def next_qid(self) -> str:
         self._qn += 1

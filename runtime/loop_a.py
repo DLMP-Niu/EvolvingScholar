@@ -1,9 +1,11 @@
-"""Build 1 — minimal Loop A on the SDK.
+"""Loop A — research activity. Runs (or continues) one research project.
 
-Runs the Scholar on one seeded TTR question over cohort A with a restrained
-(novice) tool endowment — built-ins off, only run_analysis / register_question /
-save_report — capturing all layers. No PI, no Loop C. Validates the whole
-capture path end-to-end.
+A NEW run works a seed question over cohort A; a --continue run RESUMES the same
+SDK session with the PI's newly-assigned tasks (partial re-run — prior context is
+intact, so the Scholar does only what's needed; ADR-0013). The Scholar's evolved
+skills/strategy are loaded from scholar_core/ at the start of every run (ADR-0001
+retrieval; load-all is fine for the pilot's small library). Four-layer capture
+throughout.
 """
 from __future__ import annotations
 
@@ -11,6 +13,8 @@ import asyncio
 import sys
 from datetime import datetime
 from pathlib import Path
+
+import yaml
 
 from claude_agent_sdk import (  # type: ignore
     AssistantMessage,
@@ -20,24 +24,30 @@ from claude_agent_sdk import (  # type: ignore
     query,
 )
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "runtime"))
+sys.path.insert(0, str(REPO / "harness"))
 from capture import RunContext, build_capture, capture_stream  # noqa: E402
 from tools import build_loop_a_tools  # noqa: E402
 
-REPO = Path(__file__).resolve().parent.parent
 COHORT_DIR = REPO / "data" / "synthetic_ttr_REACTSP_tsv_datasets"
+CORE = REPO / "scholar_core"
 COHORT = "A"
 
-# Restrained (novice) endowment: explicitly deny built-ins so the Scholar has ONLY
-# its custom tools (ADR-0010 endowment knob). allowed_tools alone did not block them.
+# Restrained (novice) endowment: deny built-ins so the Scholar has only its custom
+# tools + web (ADR-0010 knob). WebSearch/WebFetch are ALLOWED — literature is a core
+# Loop A capability; how-to-search stays a mentored EPA (ADR-0011).
 BUILTIN_TOOLS = [
     "Bash", "Read", "Write", "Edit", "NotebookEdit", "Glob", "Grep",
-    "Task", "ToolSearch", "TodoWrite", "BashOutput",
-    "KillShell", "Skill", "ExitPlanMode",
+    "Task", "ToolSearch", "TodoWrite", "BashOutput", "KillShell", "Skill", "ExitPlanMode",
 ]
-# WebSearch/WebFetch are ALLOWED — literature access is a core Loop A capability.
-# HOW to search well (which sources, search strategy) is left to PI mentoring, not
-# prescribed here (ADR-0011: provide the primitive, mentor the method).
+ALLOWED_TOOLS = [
+    "mcp__scholar__register_question",
+    "mcp__scholar_tools__run_analysis",
+    "mcp__scholar_tools__save_report",
+    "WebSearch",
+    "WebFetch",
+]
 
 SEED_QUESTION = (
     "Seed question: Using cohort A's EMR data, characterize the TTR / hereditary ATTR "
@@ -46,7 +56,7 @@ SEED_QUESTION = (
     "amyloidosis (ICD E85.x) patients?"
 )
 
-SYSTEM_PROMPT = """You are the Scholar — an AI research intern in clinical molecular genetics, at the start of training.
+SYSTEM_PROMPT = """You are the Scholar — an AI research intern in clinical molecular genetics.
 You are working on ONE research project: TTR / hereditary ATTR amyloidosis, using a synthetic EMR cohort.
 
 Your complete toolset:
@@ -55,32 +65,48 @@ Your complete toolset:
 - register_question(...): call this the moment you form a research question you decide to pursue, BEFORE investigating it. Set cognitive_level (1-9), medical_purpose (research-mechanistic|clinical-management|counseling-pathway), origin (seeded|self-generated|pi-suggested|spawned), and parent_q_id/edge_type if it follows from an earlier question.
 - save_report(markdown): at the very end, save your report structured by the 7 questions.
 
-Work the seed question: register the questions you pursue, use run_analysis to investigate them, note any data-quality problems you find, then finish by calling save_report. Ground every claim in what the data actually shows. This is synthetic data — findings are not clinically valid; treat it as a workflow exercise."""
+Register the questions you pursue, use run_analysis to investigate them, note any data-quality problems you find, then finish by calling save_report. Ground every claim in what the data actually shows. This is synthetic data — findings are not clinically valid; treat it as a workflow exercise."""
 
 
-async def main() -> None:
-    run_id = "ttrA-" + datetime.now().strftime("%Y%m%d-%H%M%S")
-    run_dir = REPO / "experiments" / "runs" / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
-    ctx = RunContext(run_id=run_id, cycle=1, run_dir=run_dir)
+def load_scholar_core(core: Path = CORE) -> str:
+    """Load accumulated skills + strategy into context (ADR-0001: retrieved, not a
+    growing prompt — load-all suffices for the pilot's small library; switch to
+    relevance-retrieval once it grows). Returns '' at cycle 0 (nothing learned yet)."""
+    parts: list[str] = []
+    for sub in ("capabilities", "strategy"):
+        for f in sorted((core / sub).glob("*.md")):
+            parts.append(f"### {sub}/{f.name}\n{f.read_text(encoding='utf-8').strip()}")
+    if not parts:
+        return ""
+    return ("\n\n# Your accumulated skills and research strategy from prior work — "
+            "apply them by default.\n\n" + "\n\n".join(parts))
+
+
+async def run_project(
+    prompt: str,
+    resume_session_id: str | None = None,
+    run_dir: Path | None = None,
+    cohort: str = COHORT,
+    cycle: int = 1,
+) -> tuple[str | None, Path]:
+    """Run (new) or continue (resume) one research project. Returns (session_id, run_dir)."""
+    if run_dir is None:
+        run_id = f"ttr{cohort}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        run_dir = REPO / "experiments" / "runs" / run_id
+        run_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        run_dir = Path(run_dir)
+        run_id = run_dir.name
+    ctx = RunContext(run_id=run_id, cycle=cycle, run_dir=run_dir)  # restores q-counter on continue
 
     cap_servers, hooks = build_capture(ctx)
-    tools_server = build_loop_a_tools(COHORT_DIR, COHORT, run_dir)
-    mcp_servers = {**cap_servers, "scholar_tools": tools_server}
+    mcp_servers = {**cap_servers, "scholar_tools": build_loop_a_tools(COHORT_DIR, cohort, run_dir)}
 
-    allowed = [
-        "mcp__scholar__register_question",
-        "mcp__scholar_tools__run_analysis",
-        "mcp__scholar_tools__save_report",
-        "WebSearch",
-        "WebFetch",
-    ]
-
-    options = ClaudeAgentOptions(
+    kwargs = dict(
         cwd=str(REPO),
-        system_prompt=SYSTEM_PROMPT,
+        system_prompt=SYSTEM_PROMPT + load_scholar_core(),
         mcp_servers=mcp_servers,
-        allowed_tools=allowed,
+        allowed_tools=ALLOWED_TOOLS,
         disallowed_tools=BUILTIN_TOOLS,
         hooks=hooks,
         setting_sources=["project"],
@@ -88,30 +114,70 @@ async def main() -> None:
         max_turns=30,
         env={"CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"},
     )
+    if resume_session_id:
+        kwargs["resume"] = resume_session_id
+    options = ClaudeAgentOptions(**kwargs)
 
-    (run_dir / "meta.yaml").write_text(
-        f"run_id: {run_id}\ncohort: {COHORT}\ncycle: 1\n"
-        f"started: {datetime.now().isoformat()}\nseed_question: |\n  {SEED_QUESTION}\n",
-        encoding="utf-8",
+    meta_path = run_dir / "meta.yaml"
+    meta = yaml.safe_load(meta_path.read_text()) if meta_path.exists() else {
+        "run_id": run_id, "cohort": cohort, "cycle": cycle,
+        "started": datetime.now().isoformat(), "seed_question": SEED_QUESTION, "turns": [],
+    }
+    meta.setdefault("turns", []).append(
+        {"resumed": bool(resume_session_id), "prompt": prompt[:200], "at": datetime.now().isoformat()}
     )
+    meta_path.write_text(yaml.safe_dump(meta, sort_keys=False), encoding="utf-8")
 
-    print(f"[loop_a] run_id={run_id}  cohort={COHORT}")
+    print(f"[loop_a] {'continue' if resume_session_id else 'new'} run={run_id} cohort={cohort} cycle={cycle}")
     result = None
-    async for msg in capture_stream(query(prompt=SEED_QUESTION, options=options), ctx):
+    async for msg in capture_stream(query(prompt=prompt, options=options), ctx):
         if isinstance(msg, AssistantMessage):
             for b in msg.content:
                 if isinstance(b, TextBlock) and b.text.strip():
-                    print("SCHOLAR:", b.text.strip()[:220])
+                    print("SCHOLAR:", b.text.strip()[:200])
         if isinstance(msg, ResultMessage):
             result = msg
 
-    print("\n=== run complete ===")
+    session_id = getattr(result, "session_id", None)
+    if session_id:
+        meta["session_id"] = session_id
+        meta_path.write_text(yaml.safe_dump(meta, sort_keys=False), encoding="utf-8")
     if result is not None:
-        print("is_error:", result.is_error, " turns:", result.num_turns,
-              " cost_usd:", result.total_cost_usd)
-        print("result:", (result.result or "")[:300])
+        print(f"\n[loop_a] done — is_error={result.is_error} turns={result.num_turns} "
+              f"cost=${result.total_cost_usd} session={session_id}")
     print("artifacts in:", run_dir)
+    return session_id, run_dir
+
+
+def _continue(run_dir: str) -> None:
+    from pi import pending_tasks  # noqa: E402
+
+    rd = Path(run_dir)
+    meta = yaml.safe_load((rd / "meta.yaml").read_text())
+    sid = meta.get("session_id")
+    if not sid:
+        raise SystemExit(f"no session_id in {rd}/meta.yaml — cannot resume")
+    tasks = pending_tasks(rd)
+    if not tasks:
+        raise SystemExit("no pending tasks (feedback status != 'needs_more' or new_tasks empty)")
+    prompt = (
+        "Your PI reviewed your work and assigned these additional tasks. Address ONLY what is "
+        "needed, reusing your prior work — do not redo settled analyses. Register any new "
+        "questions, run needed analyses, then update your report via save_report:\n"
+        + "\n".join(f"- {t}" for t in tasks)
+    )
+    asyncio.run(run_project(prompt, resume_session_id=sid, run_dir=rd,
+                            cohort=meta.get("cohort", COHORT), cycle=int(meta.get("cycle", 1))))
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Loop A — run or continue a research project.")
+    ap.add_argument("--continue", dest="cont", metavar="RUN_DIR",
+                    help="resume this run with the PI's pending tasks (ADR-0013)")
+    args = ap.parse_args()
+    if args.cont:
+        _continue(args.cont)
+    else:
+        asyncio.run(run_project(SEED_QUESTION))
