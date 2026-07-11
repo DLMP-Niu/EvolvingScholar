@@ -25,3 +25,9 @@ The **direction** the Scholar grows toward on the entrustment ladder: increasing
 
 ## EPA (Entrustable Professional Activity)
 A unit of professional work the Scholar can be entrusted to perform (e.g. "conduct a targeted literature review," "run and interpret a stratified EMR analysis"). The Scholar's **capabilities** are expressed as EPAs, and evolution is read out as the EPAs **extractable after each cycle** (format may vary — a sentence in a `skill.md`, a structured entry). A human trainee accumulates **knowledge, EPAs, and question-raising ability**; EPAs and question-raising are the AI-comparable dimensions — **knowledge is asymmetric** (the Scholar starts knowledge-rich, ADR-0005).
+
+## Question
+An inquiry the **Scholar raises** and pursues, logged in the question registry with its cognitive level (1–9) and medical purpose. Scholar-originated — contrast **Task**.
+
+## Task
+A unit of work the **PI assigns** to the Scholar within a cycle (e.g. "also stratify by comorbid diabetes"). PI-originated — contrast **Question**. The iterative within-cycle review may add tasks, prompting a partial re-run (ADR-0013).

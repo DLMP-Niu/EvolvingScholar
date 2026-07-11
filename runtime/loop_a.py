@@ -32,9 +32,12 @@ COHORT = "A"
 # its custom tools (ADR-0010 endowment knob). allowed_tools alone did not block them.
 BUILTIN_TOOLS = [
     "Bash", "Read", "Write", "Edit", "NotebookEdit", "Glob", "Grep",
-    "WebSearch", "WebFetch", "Task", "ToolSearch", "TodoWrite", "BashOutput",
+    "Task", "ToolSearch", "TodoWrite", "BashOutput",
     "KillShell", "Skill", "ExitPlanMode",
 ]
+# WebSearch/WebFetch are ALLOWED — literature access is a core Loop A capability.
+# HOW to search well (which sources, search strategy) is left to PI mentoring, not
+# prescribed here (ADR-0011: provide the primitive, mentor the method).
 
 SEED_QUESTION = (
     "Seed question: Using cohort A's EMR data, characterize the TTR / hereditary ATTR "
@@ -48,6 +51,7 @@ You are working on ONE research project: TTR / hereditary ATTR amyloidosis, usin
 
 Your complete toolset:
 - run_analysis(code): run pandas over the cohort; print aggregates only.
+- WebSearch / WebFetch: consult the medical literature and clinical guidelines.
 - register_question(...): call this the moment you form a research question you decide to pursue, BEFORE investigating it. Set cognitive_level (1-9), medical_purpose (research-mechanistic|clinical-management|counseling-pathway), origin (seeded|self-generated|pi-suggested|spawned), and parent_q_id/edge_type if it follows from an earlier question.
 - save_report(markdown): at the very end, save your report structured by the 7 questions.
 
@@ -68,6 +72,8 @@ async def main() -> None:
         "mcp__scholar__register_question",
         "mcp__scholar_tools__run_analysis",
         "mcp__scholar_tools__save_report",
+        "WebSearch",
+        "WebFetch",
     ]
 
     options = ClaudeAgentOptions(

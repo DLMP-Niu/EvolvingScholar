@@ -4,6 +4,20 @@ _Running log. Newest batch on top. Append dated batches; don't rewrite history._
 
 ---
 
+## 2026-07-11 (cont.) — Builds 1–3 running; iterative within-cycle review designed
+
+**Build progress (SDK arm).** Loop A (`runtime/loop_a.py` + `capture.py` + `tools.py`), PI review (`harness/pi.py`), and Loop C (`harness/loop_c.py`) all built and validated live end-to-end on cohort A. One demo cycle produced 2 reusable skills, 3 strategy principles, an error ledger, and a revision-map entry in `scholar_core/`. **Web search enabled** in Loop A. Known open link: `loop_a` writes-but-doesn't-read `scholar_core/` — the retrieval side (ADR-0001) isn't wired, so evolution doesn't yet take effect across runs.
+
+**Iterative within-cycle review** → [ADR-0013]. Real workflow = Loop A → PI **adds tasks** (within-cycle) → **partial re-run only if needed** (SDK session resume preserves prior context) → iterate → Loop C at convergence. New domain terms: **Task** (PI-assigned) vs **Question** (Scholar-raised).
+
+**Concrete design for the code change (not built yet):**
+- `runtime/loop_a.py`: refactor `main()` → `run_project(prompt, resume_session_id=None, run_dir=None)`; capture `ResultMessage.session_id` into `meta.yaml`; add a `--continue <run_dir>` CLI that resumes the session with the PI's new tasks and **appends** to the same run. `RunContext` restores its question counter from the existing `questions.jsonl` so numbering continues.
+- `harness/pi.py`: the feedback form gains `status: complete|needs_more` + `new_tasks: [...]`; add `pending_tasks(run_dir)` returning the tasks when `needs_more`.
+- Operator flow (human-paced): `loop_a.py` → `pi.py <run>` (fill scores + status + tasks) → if `needs_more`: `loop_a.py --continue <run>` → repeat → `loop_c.py <run>` when `complete`.
+- Related open link to close alongside: wire `scholar_core/` **loading** into `run_project` (load current skills+strategy; relevance-retrieval once the library grows) so re-runs/next cycles actually reflect evolution.
+
+---
+
 ## 2026-07-11 — Data, tools, and the two-arm resolution
 
 **Pilot data arrived.** `data/synthetic_ttr_REACTSP_tsv_datasets.zip` — two TTR/ATTR cohorts. Provenance corrected by owner: genuinely **synthetic** (randomly shuffled, 3 rounds of random processing), not perturbed real records → privacy concern resolved; it's **workflow/plumbing-grade**, so intern *findings* here are not clinically valid. Key empirical facts (see `data/README.md`): within-patient timelines are **coherent** (A001 is a clean ATTR picture), so temporal analyses are structurally runnable; **A** = deep EMR (dense dx + glucose), **B** = registry-derived + sparse (75 diabetes rows); glucose has QC garbage (0–47,330 mg/dL) and duplicated dx rows — a built-in test of intern rigor; A and B are **not poolable**.

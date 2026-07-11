@@ -16,3 +16,4 @@ Each ADR captures one consequential decision: its context, the decision, and the
 | [0010](0010-two-arms-are-demonstrations.md) | Two build arms are demonstrations, not a controlled contrast | Accepted |
 | [0011](0011-loop-a-tool-design.md) | Loop A tool design: minimal portable primitives, method withheld | Accepted |
 | [0012](0012-pilot-success-criteria.md) | Pilot success criteria (pre-registered: feasibility + directional evolution) | Accepted |
+| [0013](0013-iterative-within-cycle-review.md) | Iterative within-cycle review (task-additive) via session resume | Accepted |
