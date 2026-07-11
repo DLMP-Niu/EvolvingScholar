@@ -27,11 +27,15 @@ def reconcile(run_dir: str | Path) -> dict[str, Any]:
     thinking = _read_jsonl(run_dir / "thinking.jsonl")    # layer 2
 
     # 1. seed canonical nodes from registered questions; edges from provenance.
+    def _parent(q: dict[str, Any]) -> str | None:
+        p = q.get("parent_q_id")
+        return p if (p and str(p).strip().lower() not in {"none", "null", ""}) else None
+
     nodes = {q["q_id"]: {**q, "actions": []} for q in questions}
     edges = [
-        {"from": q["parent_q_id"], "to": q["q_id"], "type": q.get("edge_type") or "spawns"}
+        {"from": _parent(q), "to": q["q_id"], "type": q.get("edge_type") or "spawns"}
         for q in questions
-        if q.get("parent_q_id")
+        if _parent(q)
     ]
 
     # 2. attach each research action to the question active at its timestamp.

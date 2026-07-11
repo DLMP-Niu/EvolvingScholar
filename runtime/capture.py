@@ -74,6 +74,15 @@ REGISTER_QUESTION_SCHEMA: dict[str, Any] = {
     "evidence_source": str,      # literature | emr | both | ""
 }
 
+_NULLISH = {"", "none", "null", "n/a", "na"}
+
+
+def _clean(v: Any) -> Any:
+    """Normalize model-supplied sentinel strings ('none', '', ...) to None."""
+    if isinstance(v, str) and v.strip().lower() in _NULLISH:
+        return None
+    return v
+
 
 def build_capture(ctx: RunContext) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return (mcp_servers, hooks) to merge into ClaudeAgentOptions, wired to `ctx`.
@@ -108,9 +117,9 @@ def build_capture(ctx: RunContext) -> tuple[dict[str, Any], dict[str, Any]]:
                 "cognitive_level": args.get("cognitive_level"),
                 "medical_purpose": args.get("medical_purpose"),
                 "origin": args.get("origin"),
-                "parent_q_id": args.get("parent_q_id") or None,
-                "edge_type": args.get("edge_type") or None,
-                "evidence_source": args.get("evidence_source") or None,
+                "parent_q_id": _clean(args.get("parent_q_id")),
+                "edge_type": _clean(args.get("edge_type")),
+                "evidence_source": _clean(args.get("evidence_source")),
                 "status": "open",
                 "result_summary": None,
                 "quality": None,

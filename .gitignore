@@ -20,7 +20,10 @@ docs/references/*.pdf
 data/*
 !data/README.md
 !data/.gitkeep
-experiments/runs/**/*.log
+
+# Experiment run outputs (regenerable capture data; can be large) — keep the dir, not the runs.
+experiments/runs/*/
+!experiments/runs/.gitkeep
 
 # OS / WSL
 .DS_Store
