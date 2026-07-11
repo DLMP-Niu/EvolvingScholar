@@ -14,4 +14,5 @@ The intern evolves **only** through updates to external, typed, versioned artifa
 
 - **Pro:** it is the project's actual research bet; it keeps evolution legible (every change is a diff to a named artifact — the instrument for observing concept/skill change); it removes the context-length confound from the evolution measurement.
 - **Cost:** requires disciplined artifact schemas and a Loop C that writes them, rather than the easier "append to prompt."
+- **Requires retrieval:** growth artifacts must be *retrieved by relevance*, not concatenated — an always-loaded, ever-growing `skill.md` is a growing prompt in disguise. The Claude Code arm provides skill retrieval natively; the **raw-API arm must implement it**, or it silently violates this invariant. *(Surfaced in the 2026-07-11 grilling session.)*
 - **Tested by:** a flat-context-dump vs. structured-artifacts ablation.

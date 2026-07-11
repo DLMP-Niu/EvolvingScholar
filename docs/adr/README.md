@@ -12,3 +12,7 @@ Each ADR captures one consequential decision: its context, the decision, and the
 | [0006](0006-runtime-second-arm-deferred.md) | Defer the second build arm (SDK vs. raw API) | Accepted |
 | [0007](0007-config-isolation.md) | Config isolation: clean location + two CLAUDE.md tiers | Accepted |
 | [0008](0008-capture-all-four-layers.md) | Capture all four questioning layers; registry primary | Accepted |
+| [0009](0009-two-cohort-strategy-emergent-then-mentored.md) | Two-cohort analysis: emergent, then mentored (Option C) | Accepted |
+| [0010](0010-two-arms-are-demonstrations.md) | Two build arms are demonstrations, not a controlled contrast | Accepted |
+| [0011](0011-loop-a-tool-design.md) | Loop A tool design: minimal portable primitives, method withheld | Accepted |
+| [0012](0012-pilot-success-criteria.md) | Pilot success criteria (pre-registered: feasibility + directional evolution) | Accepted |

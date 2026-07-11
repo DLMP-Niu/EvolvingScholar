@@ -15,9 +15,13 @@ venv/
 # Reference PDFs (download separately; not committed)
 docs/references/*.pdf
 
-# Data — synthetic is fine to track, but keep large/generated artifacts out
-data/**/*.parquet
+# Data — keep bulk cohort files out of git (synthetic, but regenerable from the generator).
+# Ignore everything under data/ except its README and the keep-file.
+data/*
+!data/README.md
+!data/.gitkeep
 experiments/runs/**/*.log
 
-# OS
+# OS / WSL
 .DS_Store
+*:Zone.Identifier

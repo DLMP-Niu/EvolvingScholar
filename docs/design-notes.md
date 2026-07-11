@@ -4,6 +4,24 @@ _Running log. Newest batch on top. Append dated batches; don't rewrite history._
 
 ---
 
+## 2026-07-11 — Data, tools, and the two-arm resolution
+
+**Pilot data arrived.** `data/synthetic_ttr_REACTSP_tsv_datasets.zip` — two TTR/ATTR cohorts. Provenance corrected by owner: genuinely **synthetic** (randomly shuffled, 3 rounds of random processing), not perturbed real records → privacy concern resolved; it's **workflow/plumbing-grade**, so intern *findings* here are not clinically valid. Key empirical facts (see `data/README.md`): within-patient timelines are **coherent** (A001 is a clean ATTR picture), so temporal analyses are structurally runnable; **A** = deep EMR (dense dx + glucose), **B** = registry-derived + sparse (75 diabetes rows); glucose has QC garbage (0–47,330 mg/dL) and duplicated dx rows — a built-in test of intern rigor; A and B are **not poolable**.
+
+**Two-cohort strategy → Option C** (emergent, then mentored) — [ADR-0009](adr/0009-two-cohort-strategy-emergent-then-mentored.md). Real EMR discipline: characterize each cohort's data elements one-by-one, crosswalk the differences, then compare. New artifact: per-cohort data-element profile + crosswalk. Reproduces the real intern's "understand data elements first" PI-feedback moment.
+
+**Two build arms = demonstrations, not a controlled contrast** — [ADR-0010](adr/0010-two-arms-are-demonstrations.md). Runtimes differ in built-in tools: Claude Code/SDK = super-intern from day one; raw API = basic agent that grows. The science (evolving capabilities + questions) is measured *within* each arm; different endowments are intended. Endowment = per-arm allow-list knob. Sequencing: shared core → validate on SDK first (restrained endowment) → then raw-API arm.
+
+**Loop A tool design → minimal portable primitives, method withheld** — [ADR-0011](adr/0011-loop-a-tool-design.md). `run_analysis` (portable sandboxed code, not built-in Bash), `search_literature`, `register_question`, minimal save. Withhold method-encoding tools (`characterize_cohort`, `compare_cohorts`, …) — their absence is what makes method emergence observable. Method accrues as self-authored skills in `capabilities/` (Voyager pattern).
+
+**Capture layer built** ([ADR-0008](adr/0008-capture-all-four-layers.md)): `runtime/capture.py` + `harness/reconcile.py`, verified against SDK 0.2.115.
+
+**Scope / non-goal (owner).** The intern→PI ladder is a **scaffold for organizing and measuring** the Scholar's evolution — **not** a prediction that this approach makes an AI a human-like expert. Explicitly out of scope: (a) **recursive mentorship** (a Scholar mentoring another Scholar — EPA-5 "supervise others" is a coordinate, not a literal target here); (b) any claim of **human-equivalent expertise** via following a human learning path. Consistent with ADR-0002 (complementary windows, not a scoreboard) and ADR-0005 (AI starts from the opposite competence profile).
+
+**Next:** build the shared core + a minimal Loop A on the SDK (restrained endowment) to validate machinery + see first evolution.
+
+---
+
 ## 2026-07-10 — Design consolidated from planning discussion
 
 Reframing that moved the project off the original brief, plus the decisions now recorded as ADRs.
