@@ -11,3 +11,4 @@ Each ADR captures one consequential decision: its context, the decision, and the
 | [0005](0005-do-not-handicap-knowledge.md) | Do not handicap starting knowledge | Accepted |
 | [0006](0006-runtime-second-arm-deferred.md) | Defer the second build arm (SDK vs. raw API) | Accepted |
 | [0007](0007-config-isolation.md) | Config isolation: clean location + two CLAUDE.md tiers | Accepted |
+| [0008](0008-capture-all-four-layers.md) | Capture all four questioning layers; registry primary | Accepted |

@@ -5,6 +5,7 @@ Three instruments used identically by the **intern runtime**, the **harness**, a
 - [`question_registry.md`](question_registry.md) — one record per question (the two-axis annotation + provenance + quality).
 - [`review_rubric_project.md`](review_rubric_project.md) — **within-cycle** review (Loop B): scores the *research work*.
 - [`review_rubric_development.md`](review_rubric_development.md) — **between-cycle** review (feeds Loop C): scores the *intern's development* + entrustment.
+- [`capture_layer.md`](capture_layer.md) — how the AI intern's live questioning is recorded (4 layers) and reconciled into the trajectory.
 
 ## ⚠️ Reconcile with existing TTR annotations
 
