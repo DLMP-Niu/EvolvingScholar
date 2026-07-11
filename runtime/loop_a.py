@@ -31,7 +31,7 @@ COHORT = "A"
 # Restrained (novice) endowment: explicitly deny built-ins so the Scholar has ONLY
 # its custom tools (ADR-0010 endowment knob). allowed_tools alone did not block them.
 BUILTIN_TOOLS = [
-    "Bash", "Read", "Write", "Edit", "MultiEdit", "NotebookEdit", "Glob", "Grep",
+    "Bash", "Read", "Write", "Edit", "NotebookEdit", "Glob", "Grep",
     "WebSearch", "WebFetch", "Task", "ToolSearch", "TodoWrite", "BashOutput",
     "KillShell", "Skill", "ExitPlanMode",
 ]
