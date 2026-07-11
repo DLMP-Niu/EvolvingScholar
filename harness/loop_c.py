@@ -29,7 +29,7 @@ from claude_agent_sdk import (  # type: ignore
 )
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pi import load_feedback  # noqa: E402
+from pi import load_feedback, load_final_feedback  # noqa: E402
 from reconcile import reconcile  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
@@ -46,6 +46,8 @@ PROPOSAL_SCHEMA = """{
   "capability_updates": [{"name": "kebab-skill-name", "action": "create|append", "content": "markdown — a reusable method/EPA the Scholar demonstrated or was told to adopt"}],
   "strategy_updates":   [{"name": "research-taste", "action": "append", "content": "a principle of good question/method design learned this cycle"}],
   "knowledge_updates":  [{"name": "ttr-attr", "action": "append", "content": "a validated fact or data caveat"}],
+  "concept_model_updates": [{"name": "ttr-attr-model", "action": "append", "content": "how the disease concept-model changed this cycle (entities/links/corrections)"}],
+  "goal_updates":          [{"name": "research-goals", "action": "append", "content": "how the research goal/direction advanced (goal autonomy)"}],
   "ledger_entries":     [{"error_type": "...", "detected_by": "PI|self|data", "root_cause": "...", "correction": "...", "artifact_change": "which skill/strategy this maps to"}],
   "next_questions":     ["a seed question for the next cycle"]
 }"""
@@ -56,6 +58,8 @@ LOOP_C_SYSTEM = (
     "reusable updates to the Scholar's external artifacts, so it starts the next cycle better. "
     "Prefer small, specific, reusable items (a method the Scholar can re-run; a principle; a data caveat). "
     "Turn each PI critique into a ledger entry with a correction. "
+    "The feedback includes a 'development' section (growth dimensions + an entrustment level) — "
+    "use it to update the Scholar's concept-model, strategy/taste, and goals, not only its skills. "
     "Respond with ONLY a JSON object matching this schema, no prose:\n" + PROPOSAL_SCHEMA
 )
 
@@ -116,7 +120,8 @@ def _append_section(path: Path, cycle: int, run_id: str, content: str) -> None:
         path.write_text(f"# {path.stem}\n{stamp}", encoding="utf-8")
 
 
-def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str) -> list[str]:
+def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str,
+                  entrustment: dict[str, Any] | None = None) -> list[str]:
     changed: list[str] = []
 
     def write(kind: str, items: list[dict[str, Any]]) -> None:
@@ -132,6 +137,8 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str)
     write("capabilities", proposal.get("capability_updates", []))
     write("strategy", proposal.get("strategy_updates", []))
     write("knowledge", proposal.get("knowledge_updates", []))
+    write("concept_model", proposal.get("concept_model_updates", []))
+    write("goals", proposal.get("goal_updates", []))
 
     # error ledger (append-only jsonl)
     ledger = core / "ledger" / "error_ledger.jsonl"
@@ -146,6 +153,17 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str)
         _append_section(core / "strategy" / "next_questions.md", cycle, run_id,
                         "\n".join(f"- {q}" for q in proposal["next_questions"]))
         changed.append("scholar_core/strategy/next_questions.md")
+
+    # entrustment progression — the intern->PI ladder recorded across cycles
+    if entrustment and entrustment.get("overall_level") is not None:
+        ent = core / "entrustment.jsonl"
+        with ent.open("a", encoding="utf-8") as f:
+            f.write(json.dumps({
+                "cycle": cycle, "run_id": run_id, "ts": time.time(),
+                "overall_level": entrustment.get("overall_level"),
+                "per_capability": entrustment.get("per_capability", {}),
+            }) + "\n")
+        changed.append(str(ent.relative_to(core.parent)))
 
     # revision map (the changelog that proves Loop C acted)
     rev = core / "revision_map.jsonl"
@@ -163,12 +181,13 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str)
 
 async def run_loop_c(run_dir: str | Path, core: Path = REPO / "scholar_core") -> list[str]:
     run_dir = Path(run_dir)
-    feedback = load_feedback(run_dir)  # raises if unfilled
+    feedback = load_final_feedback(run_dir)  # gate: status complete + entrustment set
     meta = yaml.safe_load((run_dir / "meta.yaml").read_text())
     cycle = int(meta.get("cycle", 1))
     run_id = meta.get("run_id", run_dir.name)
     proposal = await _propose(_build_prompt(run_dir, core, feedback))
-    changed = apply_updates(proposal, Path(core), cycle, run_id)
+    entrustment = feedback["review"].get("development", {}).get("entrustment")
+    changed = apply_updates(proposal, Path(core), cycle, run_id, entrustment)
     print(f"[loop_c] revision: {proposal.get('revision_summary','')}")
     print("[loop_c] wrote:")
     for c in changed:

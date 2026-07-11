@@ -36,6 +36,17 @@ REVIEW_DIMENSIONS = [
     "self_correction",
 ]
 
+# Between-cycle development/entrustment dimensions (schemas/review_rubric_development.md).
+# Filled only at project completion — the combined final review that feeds Loop C.
+DEVELOPMENT_DIMENSIONS = [
+    "concept_model_growth",
+    "questioning_maturation",
+    "hypothesis_logic",
+    "method_repertoire",
+    "goal_autonomy",
+    "error_recurrence",
+]
+
 
 def _read_jsonl(p: Path) -> list[dict[str, Any]]:
     return [json.loads(l) for l in p.read_text().splitlines() if l.strip()] if p.exists() else []
@@ -88,6 +99,12 @@ def build_review_packet(run_dir: str | Path) -> dict[str, Path]:
                 # set 'complete' when the project is done and ready for Loop C.
                 "status": "needs_more",
                 "new_tasks": [],
+                # Filled ONLY at completion (status: complete) — the combined final
+                # development/entrustment review that feeds Loop C.
+                "development": {
+                    "scores": {d: {"score": None, "note": ""} for d in DEVELOPMENT_DIMENSIONS},
+                    "entrustment": {"overall_level": None, "per_capability": {}},
+                },
                 "overall_note": "",
             }
         }
@@ -106,6 +123,20 @@ def load_feedback(run_dir: str | Path) -> dict[str, Any]:
     filled = [d for d, v in scores.items() if isinstance(v, dict) and v.get("score") is not None]
     if not filled:
         raise ValueError(f"feedback not filled — every score is null in {fb_path}")
+    return fb
+
+
+def load_final_feedback(run_dir: str | Path) -> dict[str, Any]:
+    """Load + validate the COMBINED final review that feeds Loop C: the project
+    form must be filled, marked `status: complete`, and carry an entrustment level
+    (ADR-0013). Raises until the final review is done."""
+    fb = load_feedback(run_dir)  # project scores filled
+    review = fb.get("review", {})
+    if review.get("status") != "complete":
+        raise ValueError("final review not complete — set review.status: complete before Loop C")
+    level = review.get("development", {}).get("entrustment", {}).get("overall_level")
+    if level is None:
+        raise ValueError("no entrustment level — fill review.development.entrustment.overall_level")
     return fb
 
 

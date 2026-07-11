@@ -1,6 +1,6 @@
-# Review Rubric — WITHIN-cycle (project-focused) · Loop B
+# Review Rubric — Cycle review (project + final development/entrustment) · Loop B
 
-Used at a mid/end-of-project checkpoint to score **the research work on this pair this cycle** — not the intern's development (that's the other rubric). Fill one per review session; key comments to `q_id`s.
+Scores **the research work this cycle**. The *iterative within-cycle* review adds tasks (`status: needs_more` + `new_tasks`, driving `loop_a --continue`); at completion (`status: complete`) the **same form** also carries the **development/entrustment** section that feeds Loop C — the *combined final review* (ADR-0013). One form per run (`feedback_project.yaml`); key comments to `q_id`s. Development dimensions are defined in [`review_rubric_development.md`](review_rubric_development.md).
 
 **Design:** structured (not free-text), and **anchored to checkable facts** where possible so "PI approval" is separated from verifiable quality (reward-hacking guard). Scores 1–5 unless noted.
 
@@ -17,23 +17,39 @@ Used at a mid/end-of-project checkpoint to score **the research work on this pai
 
 ## YAML template
 
+This is the form `pi.py` actually generates (flat `{score, note}` per dimension, 1–5):
+
 ```yaml
 review:
-  type: project            # within-cycle
-  pair: TTR/ATTR
+  type: project
+  run_id: ttrA-20260711-135248
+  cohort: A
   cycle: 1
   reviewer: owner
   scores:
     literature_grounding: {score: null, note: ""}
-    citation_integrity: {hallucinated: null, count: 0, note: ""}
-    data_analysis_validity: {score: null, reproduced: null, note: ""}
-    numerical_sanity: {flag: null, note: ""}
+    citation_integrity: {score: null, note: ""}
+    data_analysis_validity: {score: null, note: ""}
+    numerical_sanity: {score: null, note: ""}
     reasoning_quality: {score: null, note: ""}
     hypothesis_quality: {score: null, note: ""}
     escalation_appropriateness: {score: null, note: ""}
     self_correction: {score: null, note: ""}
-  directives:              # next steps, keyed to questions/findings
-    - q_id: ttr-c1-007
+  directives:                     # per-question next steps
+    - q_id: ttrA-20260711-135248-q0001
       directive: ""
+  status: needs_more              # needs_more -> loop_a --continue with new_tasks; complete -> Loop C
+  new_tasks: []
+  development:                    # filled ONLY at completion (feeds Loop C)
+    scores:
+      concept_model_growth: {score: null, note: ""}
+      questioning_maturation: {score: null, note: ""}
+      hypothesis_logic: {score: null, note: ""}
+      method_repertoire: {score: null, note: ""}
+      goal_autonomy: {score: null, note: ""}
+      error_recurrence: {score: null, note: ""}
+    entrustment:
+      overall_level: null         # EPA scale: 1 observe .. 5 supervise others
+      per_capability: {}
   overall_note: ""
 ```
