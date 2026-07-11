@@ -90,12 +90,12 @@ def _thinking_config():
         from claude_agent_sdk import ThinkingConfigEnabled  # type: ignore
     except ImportError:
         return None
-    for make in (lambda: ThinkingConfigEnabled(budget_tokens=8000), lambda: ThinkingConfigEnabled()):
-        try:
-            return make()
-        except Exception:
-            continue
-    return None
+    try:
+        # ThinkingConfigEnabled is a TypedDict requiring BOTH 'type' and 'budget_tokens'
+        # (verified against SDK 0.2.115) — omitting 'type' yields a malformed config.
+        return ThinkingConfigEnabled(type="enabled", budget_tokens=8000)
+    except Exception:
+        return None
 
 
 def load_scholar_core(core: Path = CORE) -> str:
