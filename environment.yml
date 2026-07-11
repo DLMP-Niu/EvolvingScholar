@@ -1,0 +1,30 @@
+# Conda environment for EvolvingScholar.
+# Human-editable spec (loose pins). After building, freeze exact versions:
+#   conda env export > environment.lock.yml
+# and commit the lock file for reproducible runs.
+#
+# Create:   conda env create -f environment.yml
+# Update:   conda env update -f environment.yml --prune
+# Activate: conda activate evolving-scholar
+name: evolving-scholar
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  # --- scientific stack (Loop A: EMR stratification, statistical genetics) ---
+  - pandas
+  - numpy
+  - scipy
+  - statsmodels
+  - scikit-learn
+  # --- instrumentation / evaluator (tracking structures, concept-map diffs, plots) ---
+  - networkx          # concept_model snapshots as graphs → diffs
+  - matplotlib        # evaluator plots
+  - pyyaml            # capability.yaml / typed artifacts
+  # --- exploratory analysis ---
+  - jupyterlab
+  - pip
+  - pip:
+      # Claude Agent SDK (Python) — drives the Claude Code CLI already on PATH.
+      # Pin the exact version into environment.lock.yml after the first successful build.
+      - claude-agent-sdk
