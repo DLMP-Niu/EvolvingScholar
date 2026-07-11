@@ -29,6 +29,7 @@ sys.path.insert(0, str(REPO / "runtime"))
 sys.path.insert(0, str(REPO / "harness"))
 from capture import RunContext, build_capture, capture_stream  # noqa: E402
 from tools import build_loop_a_tools  # noqa: E402
+from preflight import assert_isolated_and_ready, log_effective_config  # noqa: E402
 
 COHORT_DIR = REPO / "data" / "synthetic_ttr_REACTSP_tsv_datasets"
 CORE = REPO / "scholar_core"
@@ -68,6 +69,35 @@ Your complete toolset:
 Register the questions you pursue, use run_analysis to investigate them, note any data-quality problems you find, then finish by calling save_report. Ground every claim in what the data actually shows. This is synthetic data — findings are not clinically valid; treat it as a workflow exercise."""
 
 
+def resume_prompt(tasks: list[str]) -> str:
+    """The PI's within-cycle tasks framed as a partial-re-run instruction (ADR-0013).
+    Shared by `_continue` and runtime/cycle.py so the wording is defined once."""
+    return (
+        "Your PI reviewed your work and assigned these additional tasks. Address ONLY what is "
+        "needed, reusing your prior work — do not redo settled analyses. Register any new "
+        "questions, run needed analyses, then update your report via save_report:\n"
+        + "\n".join(f"- {t}" for t in tasks)
+    )
+
+
+def _thinking_config():
+    """Enable extended thinking so layer-2 (thinking.jsonl) capture actually fires —
+    without it, capture_stream's ThinkingBlock branch never runs (see capture.py).
+    The exact symbol/params vary across claude-agent-sdk versions, so probe
+    defensively: a mismatch degrades to no layer-2 capture rather than breaking the
+    run. Confirm against the installed SDK (0.2.115) and pin this once verified."""
+    try:
+        from claude_agent_sdk import ThinkingConfigEnabled  # type: ignore
+    except ImportError:
+        return None
+    for make in (lambda: ThinkingConfigEnabled(budget_tokens=8000), lambda: ThinkingConfigEnabled()):
+        try:
+            return make()
+        except Exception:
+            continue
+    return None
+
+
 def load_scholar_core(core: Path = CORE) -> str:
     """Load accumulated skills + strategy into context (ADR-0001: retrieved, not a
     growing prompt — load-all suffices for the pilot's small library; switch to
@@ -99,6 +129,9 @@ async def run_project(
         run_id = run_dir.name
     ctx = RunContext(run_id=run_id, cycle=cycle, run_dir=run_dir)  # restores q-counter on continue
 
+    for w in assert_isolated_and_ready(REPO, COHORT_DIR):  # fail loud if not isolated/ready (ADR-0007)
+        print("[preflight] note:", w)
+
     cap_servers, hooks = build_capture(ctx)
     mcp_servers = {**cap_servers, "scholar_tools": build_loop_a_tools(COHORT_DIR, cohort, run_dir)}
 
@@ -116,7 +149,21 @@ async def run_project(
     )
     if resume_session_id:
         kwargs["resume"] = resume_session_id
-    options = ClaudeAgentOptions(**kwargs)
+
+    tc = _thinking_config()
+    try:
+        options = ClaudeAgentOptions(**({**kwargs, "thinking": tc} if tc is not None else kwargs))
+    except TypeError:  # installed SDK doesn't accept `thinking`; layer-2 capture stays empty
+        options = ClaudeAgentOptions(**kwargs)
+
+    log_effective_config(run_dir, {  # experiment record (ADR-0004/0007)
+        "run_id": run_id, "cohort": cohort, "cycle": cycle,
+        "repo": str(REPO), "cohort_dir": str(COHORT_DIR),
+        "setting_sources": ["project"], "permission_mode": "bypassPermissions",
+        "allowed_tools": ALLOWED_TOOLS, "disallowed_tools": BUILTIN_TOOLS,
+        "disable_auto_memory": True, "thinking_capture": tc is not None,
+        "resumed": bool(resume_session_id),
+    })
 
     meta_path = run_dir / "meta.yaml"
     meta = yaml.safe_load(meta_path.read_text()) if meta_path.exists() else {
@@ -160,13 +207,7 @@ def _continue(run_dir: str) -> None:
     tasks = pending_tasks(rd)
     if not tasks:
         raise SystemExit("no pending tasks (feedback status != 'needs_more' or new_tasks empty)")
-    prompt = (
-        "Your PI reviewed your work and assigned these additional tasks. Address ONLY what is "
-        "needed, reusing your prior work — do not redo settled analyses. Register any new "
-        "questions, run needed analyses, then update your report via save_report:\n"
-        + "\n".join(f"- {t}" for t in tasks)
-    )
-    asyncio.run(run_project(prompt, resume_session_id=sid, run_dir=rd,
+    asyncio.run(run_project(resume_prompt(tasks), resume_session_id=sid, run_dir=rd,
                             cohort=meta.get("cohort", COHORT), cycle=int(meta.get("cycle", 1))))
 
 

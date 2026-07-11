@@ -4,6 +4,16 @@ _Running log. Newest batch on top. Append dated batches; don't rewrite history._
 
 ---
 
+## 2026-07-11 (cont. 2) — Cycle runner + two capture/isolation fixes
+
+**Build 4 — the orchestration entrypoint (`runtime/cycle.py`).** Closes the "entrypoint to be created" gap in `runtime/README.md`. A human-in-the-loop state machine that advances one A→B→C cycle by exactly one step, deriving state from the run dir's `feedback_project.yaml` (unfilled → rebuild packet; `needs_more` → Loop A `--continue`; `complete` → Loop C). Reuses `run_project` / `build_review_packet` / `pending_tasks` / `load_final_feedback` / `run_loop_c` — sequencing only, no new loop logic. Codifies the operator flow from the previous batch into one command. The three sub-loop CLIs still work standalone.
+
+**Fix — layer-2 (thinking) capture was silently dead.** `capture.py` was ready to record `ThinkingBlock`s, but `loop_a.py` never passed a thinking config into `ClaudeAgentOptions`, so `thinking.jsonl` was always empty (and `reconcile.py`'s `abandoned` detector had nothing to read). Added `_thinking_config()` in `loop_a.py`, wired defensively (probes the SDK symbol; degrades to no-capture rather than breaking a run if the API name differs — **confirm against SDK 0.2.115 and pin**).
+
+**Fix — config-isolation guard now implemented (ADR-0007).** New `runtime/preflight.py`: `assert_isolated_and_ready()` fails loudly on an ancestor `CLAUDE.md`, a missing SDK, or unpacked-cohort-absent; `log_effective_config()` writes `run_dir/effective_config.yaml` at every launch. Called from `run_project`, so both the runner and `loop_a --continue` are covered. Guard logic unit-tested; the SDK/data-dependent paths need the real env to exercise end-to-end.
+
+---
+
 ## 2026-07-11 (cont.) — Builds 1–3 running; iterative within-cycle review designed
 
 **Build progress (SDK arm).** Loop A (`runtime/loop_a.py` + `capture.py` + `tools.py`), PI review (`harness/pi.py`), and Loop C (`harness/loop_c.py`) all built and validated live end-to-end on cohort A. One demo cycle produced 2 reusable skills, 3 strategy principles, an error ledger, and a revision-map entry in `scholar_core/`. **Web search enabled** in Loop A. Known open link: `loop_a` writes-but-doesn't-read `scholar_core/` — the retrieval side (ADR-0001) isn't wired, so evolution doesn't yet take effect across runs.
