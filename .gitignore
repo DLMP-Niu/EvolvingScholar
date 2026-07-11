@@ -28,3 +28,6 @@ experiments/runs/*/
 # OS / WSL
 .DS_Store
 *:Zone.Identifier
+
+# git bundles (transfer artifacts from cloud plan hand-offs)
+*.bundle
