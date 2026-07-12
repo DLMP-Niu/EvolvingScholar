@@ -2,6 +2,14 @@
 
 Plan for the directory/code restructure that realizes [ADR-0014](adr/0014-two-evolving-scholars.md): **shared foundation + mechanism, per-scholar engine + experience.** Do this *before* building `scholar_API`, while only `scholar_SDK` (arm 1) exists to move. The pilot keeps working throughout (it's a move + reimport + retest).
 
+## Status (branch `build/two-scholars`)
+**Done — structural separation** (the code move; logic unchanged): `runtime/` → `scholars/sdk/`, `scholar_core/` → `scholars/sdk/core/`, old runs → `scholars/sdk/runs/`, path fixups, `.gitignore`, `experiments/` trimmed to shared `results/`. Verified: compile + import graph + one live `scholar_SDK` Loop A run (all four capture layers → `scholars/sdk/runs/`).
+
+**Deferred (deliberately, to keep the move low-risk):**
+- **`common/` pure-extraction** — the SDK modules stay whole under `scholars/sdk/`; splitting pure cores into `common/` is folded into the **arm-2 build** (arm 2 triggers the real need). Until then `scholars/sdk/` holds both pure + glue.
+- **Terminology/behavior changes** (`cycle`→`run`+`project` in `meta.yaml`, project registry, explicit no-feedback-skip state) — a **separate follow-up**; not required for the structural separation and touches the runner's state logic.
+- **Clear-vs-keep the SDK store** — the held evolution artifacts were **moved, not cleared** (non-destructive). Clearing for a clean start remains an open one-command decision.
+
 ## Target layout
 ```
 EvolvingScholar/
