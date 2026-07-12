@@ -182,10 +182,19 @@ def _capture_thinking(resp: Any, ctx: RunContext) -> None:
             })
 
 
+def _serialize_msg(m: dict[str, Any]) -> dict[str, Any]:
+    """Make one message JSON-serializable: assistant turns hold raw SDK block objects
+    (for correct API replay); convert those to plain param dicts for persistence."""
+    content = m["content"]
+    if isinstance(content, list):
+        content = [b if isinstance(b, dict) else _to_param(b) for b in content]
+    return {"role": m["role"], "content": content}
+
+
 def _dump_messages(run_dir: Path, messages: list[dict[str, Any]]) -> None:
     import json
     (run_dir / "messages.jsonl").write_text(
-        "\n".join(json.dumps(m, default=str, ensure_ascii=False) for m in messages) + "\n",
+        "\n".join(json.dumps(_serialize_msg(m), default=str, ensure_ascii=False) for m in messages) + "\n",
         encoding="utf-8")
 
 
@@ -301,7 +310,11 @@ def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT
             if getattr(b, "type", None) == "text" and (b.text or "").strip():
                 print("SCHOLAR:", b.text.strip()[:200])
 
-        messages.append({"role": "assistant", "content": [_to_param(b) for b in resp.content]})
+        # Echo the RAW response blocks (Anthropic's documented pattern): the SDK
+        # coerces them to clean input params, stripping output-only fields AND
+        # preserving server-tool pairing (web_search/code_execution). Hand-built
+        # dicts break that pairing. Persistence serializes these via _to_param.
+        messages.append({"role": "assistant", "content": list(resp.content)})
         stop_reason = getattr(resp, "stop_reason", None)
 
         if stop_reason == "tool_use":
