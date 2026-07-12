@@ -4,6 +4,21 @@ _Running log. Newest batch on top. Append dated batches; don't rewrite history._
 
 ---
 
+## 2026-07-12 — Arm 2 (scholar_API) live; future note: provenance (memory vs. citation)
+
+**Arm 2 built and running.** `scholars/api/` — the raw Messages API scholar (hand-written tool-use loop, adaptive-thinking capture, minimal endowment, `--continue` by replaying `messages.jsonl`; reuses `common/` unchanged). First live Loop A on TTR cohort A completed: web-off baseline `ttrA-api-20260712-092359`, plus an **opt-in** web-enabled variant (`SCHOLAR_API_WEB=1` → server-side `web_search`/`web_fetch`; run `ttrA-api-web-20260712-100649`). The web variant deliberately diverges from the ADR-0014 minimal endowment — kept as a **labelled comparison run**; the default stays web-free. Both awaiting PI feedback. (Getting the web arm to complete surfaced three engine fixes: clean assistant-echo params, transient-stream retry, and raw-block echo for server-tool pairing.)
+
+**Future design note — provenance: memory vs. verifiable citation (DEFERRED to next version; current version ships self-note as-is).** The scholar self-reports where a claim comes from — the web-off run correctly *flagged* literature claims as needing verification (because the prompt told it to); the web-on run cited a source. But this is **self-report, not enforced**: the open LLM problem is that a fluent parametric recollection and a retrieved fact look identical in the output. Current mechanism = prompt-level self-note only (the `API_TOOLSET` "flag any claim a live citation would verify" line + `register_question.evidence_source` ∈ {literature|emr|both}). Adequate for the demo.
+
+Next-version direction — a three-tier ladder, applies to **both** arms:
+- **Tier 1 — self-note** (now): model tags provenance in prose; trusted, unenforced.
+- **Tier 2 — validated-citation-when-present** (nearly free): web search (Agent-SDK built-in for arm 1; `web_search_20260209` server tool for arm 2) and the API document **Citations** feature *mechanically guarantee a citation, once present, is genuine* (no fabricated spans) — but do **not** force every claim to be cited. This converts the problem into a checkable policy: *an uncited literature claim ⇒ treat as from memory, unverified.*
+- **Tier 3 — enforced cite-or-flag + structured claim ledger** (an EPA): a post-hoc check binds every literature claim to a validated citation or an explicit "parametric — unverified" tag; the citation-extraction/summarization rule itself becomes a learned capability in `core/capabilities/` (candidate `literature-evidence-extraction.md`, refinable by Loop C) and a candidate **review dimension** alongside `citation_integrity`.
+
+Arm asymmetry: the two arms reach Tier 2/3 by *different mechanisms* — arm 1 leans on Agent-SDK built-in web tools; arm 2 can use the raw-API document **Citations** feature directly (span-level, validated) if literature is supplied as documents. Provenance is therefore a place the endowments genuinely diverge (relates to [ADR-0010](adr/0010-two-arms-are-demonstrations.md) / [ADR-0014](adr/0014-two-evolving-scholars.md), tools per [ADR-0011](adr/0011-loop-a-tool-design.md)). Checked 2026-07-12: Claude Code ships **no** dedicated provenance skill/tool — the enforcement primitives live at the API/tool layer. Likely warrants its own ADR when picked up.
+
+---
+
 ## 2026-07-11 (cont. 4) — Build 5 complete: two-scholar layout + common/ + cycle→run
 
 Branch `build/two-scholars`. Realizes ADR-0014 in full — done in two commits (structural move, then the parts I'd deferred):
