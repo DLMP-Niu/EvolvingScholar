@@ -16,16 +16,30 @@ def seed_question(project_id: str, cohort: str) -> str:
     )
 
 
-def system_prompt(project_id: str, cohort: str) -> str:
+# Cycle-0 toolsets — the ONE part of the base prompt that differs per scholar
+# (ADR-0014's endowment split). The persona/task/7-question framing above is shared.
+SDK_TOOLSET = """- run_analysis(code): run pandas over the cohort; print aggregates only.
+- WebSearch / WebFetch: consult the medical literature and clinical guidelines.
+- register_question(...): call this the moment you form a research question you decide to pursue, BEFORE investigating it. Set cognitive_level (1-9), medical_purpose (research-mechanistic|clinical-management|counseling-pathway), origin (seeded|self-generated|pi-suggested|spawned), and parent_q_id/edge_type if it follows from an earlier question.
+- save_report(markdown): at the very end, save your report structured by the 7 questions."""
+
+# scholar_API is the "basic agent that grows": no literature-search tool at cycle 0
+# (it must grow its own; ADR-0014). Literature comes from its own knowledge for now.
+API_TOOLSET = """- run_analysis(code): run pandas over the cohort; print aggregates only.
+- register_question(...): call this the moment you form a research question you decide to pursue, BEFORE investigating it. Set cognitive_level (1-9), medical_purpose (research-mechanistic|clinical-management|counseling-pathway), origin (seeded|self-generated|pi-suggested|spawned), and parent_q_id/edge_type if it follows from an earlier question.
+- save_report(markdown): at the very end, save your report structured by the 7 questions.
+You have NO literature-search tool yet — draw on your own training knowledge for medical
+literature and clinical guidelines, and flag any claim that a live citation would need to verify."""
+
+
+def system_prompt(project_id: str, cohort: str, toolset: str | None = None) -> str:
     proj = get_project(project_id)
+    tools = SDK_TOOLSET if toolset is None else toolset  # SDK default keeps prior output byte-identical
     return f"""You are the Scholar — an AI research intern in clinical molecular genetics.
 You are working on ONE research project: {proj['disease']}, using a synthetic EMR cohort (cohort {cohort}).
 
 Your complete toolset:
-- run_analysis(code): run pandas over the cohort; print aggregates only.
-- WebSearch / WebFetch: consult the medical literature and clinical guidelines.
-- register_question(...): call this the moment you form a research question you decide to pursue, BEFORE investigating it. Set cognitive_level (1-9), medical_purpose (research-mechanistic|clinical-management|counseling-pathway), origin (seeded|self-generated|pi-suggested|spawned), and parent_q_id/edge_type if it follows from an earlier question.
-- save_report(markdown): at the very end, save your report structured by the 7 questions.
+{tools}
 
 Register the questions you pursue, use run_analysis to investigate them, note any data-quality problems you find, then finish by calling save_report. Ground every claim in what the data actually shows. This is synthetic data — findings are not clinically valid; treat it as a workflow exercise."""
 
