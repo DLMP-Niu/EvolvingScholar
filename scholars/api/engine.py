@@ -30,7 +30,7 @@ from capture import RunContext, _clean  # noqa: E402
 from emr_tools import run_cohort_analysis  # noqa: E402
 from preflight import assert_isolated_and_ready, log_effective_config  # noqa: E402
 from projects import DEFAULT_PROJECT, resolve_cohort  # noqa: E402
-from prompts import API_TOOLSET, resume_prompt, seed_question, system_prompt  # noqa: E402
+from prompts import API_TOOLSET, API_TOOLSET_WEB, resume_prompt, seed_question, system_prompt  # noqa: E402
 from scholar_io import load_scholar_core, next_run_no  # noqa: E402
 
 SCHOLAR = "api"
@@ -44,6 +44,9 @@ COHORT_DIR = REPO / "data" / "synthetic_ttr_REACTSP_tsv_datasets"
 MODEL = os.getenv("SCHOLAR_API_MODEL", "claude-opus-4-8")
 MAX_TOKENS = int(os.getenv("SCHOLAR_API_MAX_TOKENS", "16000"))
 MAX_TURNS = 30
+# Opt-in web endowment (ADR-0014 default is OFF — the minimal arm). SCHOLAR_API_WEB=1
+# adds server-side web_search/web_fetch; use only for labelled comparison runs.
+WEB_DEFAULT = os.getenv("SCHOLAR_API_WEB", "").strip().lower() in ("1", "true", "yes", "on")
 
 # JSON-Schema mirror of common/capture.REGISTER_QUESTION_SCHEMA (which is in the
 # SDK's name->type dict form). Kept in sync by hand — the raw API needs real schema.
@@ -63,9 +66,11 @@ _REGISTER_QUESTION_JSONSCHEMA = {
 }
 
 
-def _tool_defs() -> list[dict[str, Any]]:
-    """scholar_API's minimal cycle-0 toolset (no literature search — see API_TOOLSET)."""
-    return [
+def _tool_defs(web: bool = False) -> list[dict[str, Any]]:
+    """scholar_API's cycle-0 toolset. Minimal by default (no literature search — see
+    API_TOOLSET); `web=True` adds Anthropic's server-side web_search/web_fetch tools
+    (run server-side; no client dispatch), for the opt-in comparison variant."""
+    defs: list[dict[str, Any]] = [
         {
             "name": "run_analysis",
             "description": (
@@ -98,6 +103,12 @@ def _tool_defs() -> list[dict[str, Any]]:
                              "properties": {"markdown": {"type": "string"}}, "required": ["markdown"]},
         },
     ]
+    if web:  # server-side tools: Anthropic runs them, results return inline (no client dispatch)
+        defs += [
+            {"type": "web_search_20260209", "name": "web_search"},
+            {"type": "web_fetch_20260209", "name": "web_fetch"},
+        ]
+    return defs
 
 
 # ---- tool dispatch (pure cores live in common/) --------------------------------
@@ -152,6 +163,11 @@ def _to_param(b: Any) -> dict[str, Any]:
         return {"type": "redacted_thinking", "data": getattr(b, "data", "")}
     if t == "tool_use":
         return {"type": "tool_use", "id": b.id, "name": b.name, "input": b.input}
+    if t == "server_tool_use":  # web_search/web_fetch invocation (server-run)
+        return {"type": "server_tool_use", "id": b.id, "name": b.name, "input": b.input}
+    if t in ("web_search_tool_result", "web_fetch_tool_result"):  # server-tool results, echoed for context
+        d = _block_dump(b)
+        return {k: d[k] for k in ("type", "tool_use_id", "content") if k in d}
     return _block_dump(b)  # unknown block: best effort
 
 
@@ -184,16 +200,18 @@ def _load_messages(run_dir: Path) -> list[dict[str, Any]]:
 
 def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT_PROJECT,
                 cohort: str | None = None, run_no: int | None = None, resume: bool = False,
-                client: Any = None) -> Path:
+                web: bool | None = None, client: Any = None) -> Path:
     """Run (new) or continue (replay) one experiment run. Returns run_dir.
 
     A NEW run (run_dir=None) is numbered as this scholar's next feedback-gated run
     (`next_run_no`) unless `run_no` is given; a --continue run (resume=True) reloads
-    the persisted message history from run_dir and appends the PI's tasks."""
+    the persisted message history from run_dir and appends the PI's tasks. `web`
+    (default from SCHOLAR_API_WEB) opts into server-side web_search/web_fetch."""
     client = client or anthropic.Anthropic()
+    web = WEB_DEFAULT if web is None else web
     cohort = resolve_cohort(project, cohort)
     if run_dir is None:
-        run_id = f"ttr{cohort}-api-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        run_id = f"ttr{cohort}-api{'-web' if web else ''}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         run_dir = RUNS_DIR / run_id
         run_dir.mkdir(parents=True, exist_ok=True)
         if run_no is None:
@@ -208,22 +226,25 @@ def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT
     for w in assert_isolated_and_ready(REPO, COHORT_DIR):  # fail loud if not isolated/ready (ADR-0007)
         print("[preflight] note:", w)
 
-    system = system_prompt(project, cohort, toolset=API_TOOLSET) + load_scholar_core(CORE)
-    tools = _tool_defs()
+    toolset = API_TOOLSET_WEB if web else API_TOOLSET
+    system = system_prompt(project, cohort, toolset=toolset) + load_scholar_core(CORE)
+    tools = _tool_defs(web)
     messages: list[dict[str, Any]] = _load_messages(run_dir) if resume else []
     messages.append({"role": "user", "content": prompt})
 
+    endowment = ("raw-messages-api + web (variant: run_analysis/web_search/web_fetch/"
+                 "register_question/save_report)" if web else
+                 "raw-messages-api (minimal: run_analysis/register_question/save_report; no web)")
     log_effective_config(run_dir, {  # experiment record (ADR-0004/0007)
         "run_id": run_id, "scholar": SCHOLAR, "project": project, "cohort": cohort, "run": run_no,
         "repo": str(REPO), "cohort_dir": str(COHORT_DIR), "model": MODEL, "max_tokens": MAX_TOKENS,
-        "endowment": "raw-messages-api (minimal: run_analysis/register_question/save_report; no web)",
-        "thinking": "adaptive", "resumed": resume,
+        "endowment": endowment, "web": web, "thinking": "adaptive", "resumed": resume,
     })
 
     meta_path = run_dir / "meta.yaml"
     meta = yaml.safe_load(meta_path.read_text()) if meta_path.exists() else {
         "run_id": run_id, "scholar": SCHOLAR, "project": project, "cohort": cohort, "run": run_no,
-        "model": MODEL, "started": datetime.now().isoformat(),
+        "model": MODEL, "web": web, "started": datetime.now().isoformat(),
         "seed_question": seed_question(project, cohort), "turns": [],
     }
     meta.setdefault("turns", []).append(
@@ -231,7 +252,7 @@ def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT
     meta_path.write_text(yaml.safe_dump(meta, sort_keys=False), encoding="utf-8")
 
     print(f"[engine] {'continue' if resume else 'new'} run={run_id} "
-          f"project={project} cohort={cohort} run_no={run_no} model={MODEL}")
+          f"project={project} cohort={cohort} run_no={run_no} model={MODEL} web={web}")
 
     in_tok = out_tok = 0
     stop_reason = None
@@ -292,7 +313,7 @@ def _continue(run_dir: str) -> None:
     tasks = pending_tasks(rd)
     if not tasks:
         raise SystemExit("no pending tasks (feedback status != 'needs_more' or new_tasks empty)")
-    run_project(resume_prompt(tasks), run_dir=rd, resume=True,
+    run_project(resume_prompt(tasks), run_dir=rd, resume=True, web=meta.get("web"),
                 project=meta.get("project", DEFAULT_PROJECT), cohort=meta.get("cohort"),
                 run_no=int(meta.get("run", 1)))
 

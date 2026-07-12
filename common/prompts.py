@@ -31,6 +31,13 @@ API_TOOLSET = """- run_analysis(code): run pandas over the cohort; print aggrega
 You have NO literature-search tool yet — draw on your own training knowledge for medical
 literature and clinical guidelines, and flag any claim that a live citation would need to verify."""
 
+# Opt-in variant: the same minimal arm but WITH server-side web tools. Diverges from
+# scholar_API's ADR-0014 endowment (no search) — use only for labelled comparison runs.
+API_TOOLSET_WEB = """- run_analysis(code): run pandas over the cohort; print aggregates only.
+- web_search / web_fetch: search the web and fetch pages to consult the medical literature and clinical guidelines. Cite the sources you actually rely on.
+- register_question(...): call this the moment you form a research question you decide to pursue, BEFORE investigating it. Set cognitive_level (1-9), medical_purpose (research-mechanistic|clinical-management|counseling-pathway), origin (seeded|self-generated|pi-suggested|spawned), and parent_q_id/edge_type if it follows from an earlier question.
+- save_report(markdown): at the very end, save your report structured by the 7 questions."""
+
 
 def system_prompt(project_id: str, cohort: str, toolset: str | None = None) -> str:
     proj = get_project(project_id)
