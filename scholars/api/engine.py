@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 import anthropic  # type: ignore
+import httpx  # type: ignore  (anthropic's transport; raw stream drops surface as httpx.TransportError)
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent.parent
@@ -196,6 +197,31 @@ def _load_messages(run_dir: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
+# Transient failures worth retrying a whole turn on. A mid-stream drop
+# (httpx.TransportError, incl. RemoteProtocolError) isn't retried by the SDK's
+# streaming path; 429/5xx/connection are. NOT BadRequestError — that's a real bug.
+_TRANSIENT = (anthropic.APIConnectionError, anthropic.RateLimitError,
+              anthropic.InternalServerError, httpx.TransportError)
+
+
+def _call_model(client: Any, **kw: Any) -> Any:
+    """One assistant turn, with retry on transient stream/connection failures. Safe
+    to retry: the caller only mutates state after this returns, so a dropped turn
+    replays the identical request."""
+    last: Exception | None = None
+    for attempt in range(4):
+        try:
+            with client.messages.stream(**kw) as stream:  # stream: large max_tokens vs HTTP timeouts
+                return stream.get_final_message()
+        except _TRANSIENT as e:
+            last = e
+            wait = 3 * (attempt + 1)
+            print(f"[engine] transient stream error ({type(e).__name__}); "
+                  f"retry {attempt + 1}/3 in {wait}s")
+            time.sleep(wait)
+    raise last  # exhausted retries
+
+
 # ---- Loop A run ----------------------------------------------------------------
 
 def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT_PROJECT,
@@ -257,11 +283,9 @@ def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT
     in_tok = out_tok = 0
     stop_reason = None
     for _turn in range(MAX_TURNS):
-        with client.messages.stream(  # stream so large max_tokens doesn't hit HTTP timeouts
-            model=MODEL, max_tokens=MAX_TOKENS, system=system, tools=tools, messages=messages,
-            thinking={"type": "adaptive", "display": "summarized"},
-        ) as stream:
-            resp = stream.get_final_message()
+        resp = _call_model(client, model=MODEL, max_tokens=MAX_TOKENS, system=system,
+                           tools=tools, messages=messages,
+                           thinking={"type": "adaptive", "display": "summarized"})
 
         ctx.transcript.append({  # layer 1
             "type": "message", "model": getattr(resp, "model", None),
