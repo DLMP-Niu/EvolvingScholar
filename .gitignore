@@ -21,9 +21,9 @@ data/*
 !data/README.md
 !data/.gitkeep
 
-# Experiment run outputs (regenerable capture data; can be large) — keep the dir, not the runs.
-experiments/runs/*/
-!experiments/runs/.gitkeep
+# Per-scholar run outputs (regenerable capture data; can be large) — keep the dir, not the runs.
+scholars/*/runs/*/
+!scholars/*/runs/.gitkeep
 
 # OS / WSL
 .DS_Store

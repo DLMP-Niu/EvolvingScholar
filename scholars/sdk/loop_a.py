@@ -24,15 +24,15 @@ from claude_agent_sdk import (  # type: ignore
     query,
 )
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO / "runtime"))
+REPO = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(REPO / "scholars" / "sdk"))
 sys.path.insert(0, str(REPO / "harness"))
 from capture import RunContext, build_capture, capture_stream  # noqa: E402
 from tools import build_loop_a_tools  # noqa: E402
 from preflight import assert_isolated_and_ready, log_effective_config  # noqa: E402
 
 COHORT_DIR = REPO / "data" / "synthetic_ttr_REACTSP_tsv_datasets"
-CORE = REPO / "scholar_core"
+CORE = REPO / "scholars" / "sdk" / "core"
 COHORT = "A"
 
 # Restrained (novice) endowment: deny built-ins so the Scholar has only its custom
@@ -122,7 +122,7 @@ async def run_project(
     """Run (new) or continue (resume) one research project. Returns (session_id, run_dir)."""
     if run_dir is None:
         run_id = f"ttr{cohort}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-        run_dir = REPO / "experiments" / "runs" / run_id
+        run_dir = REPO / "scholars" / "sdk" / "runs" / run_id
         run_dir.mkdir(parents=True, exist_ok=True)
     else:
         run_dir = Path(run_dir)

@@ -179,7 +179,7 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str,
     return sorted(set(changed))
 
 
-async def run_loop_c(run_dir: str | Path, core: Path = REPO / "scholar_core") -> list[str]:
+async def run_loop_c(run_dir: str | Path, core: Path = REPO / "scholars" / "sdk" / "core") -> list[str]:
     run_dir = Path(run_dir)
     feedback = load_final_feedback(run_dir)  # gate: status complete + entrustment set
     meta = yaml.safe_load((run_dir / "meta.yaml").read_text())
