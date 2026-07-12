@@ -125,13 +125,34 @@ def _dispatch(name: str, args: dict[str, Any], ctx: RunContext, cohort: str, run
 # ---- content-block (de)serialization -------------------------------------------
 
 def _block_dump(b: Any) -> dict[str, Any]:
-    """Serialize an SDK content block (or a test double) to a plain dict for both
-    the transcript and the replayable message history. model_dump preserves the
-    thinking-block `signature`, which the API requires unchanged on continue."""
+    """Full serialization of a response content block for the transcript log (layer 1).
+    Includes SDK output-only fields; NOT safe to replay as request input — use
+    `_to_param` for anything sent back to the API."""
     if hasattr(b, "model_dump"):
         return b.model_dump()
     keys = ("type", "id", "name", "input", "text", "thinking", "signature")
     return {k: getattr(b, k) for k in keys if getattr(b, k, None) is not None}
+
+
+def _to_param(b: Any) -> dict[str, Any]:
+    """Convert a RESPONSE content block into a clean request-input param dict — only
+    the fields the API accepts on the way back in. A naive model_dump() carries
+    output-only fields (e.g. text.parsed_output) that the API rejects with a 400.
+    Thinking blocks keep `signature`, which must be replayed unchanged on the same model."""
+    t = getattr(b, "type", None)
+    if t == "text":
+        return {"type": "text", "text": b.text}
+    if t == "thinking":
+        p = {"type": "thinking", "thinking": getattr(b, "thinking", "") or ""}
+        sig = getattr(b, "signature", None)
+        if sig is not None:
+            p["signature"] = sig
+        return p
+    if t == "redacted_thinking":
+        return {"type": "redacted_thinking", "data": getattr(b, "data", "")}
+    if t == "tool_use":
+        return {"type": "tool_use", "id": b.id, "name": b.name, "input": b.input}
+    return _block_dump(b)  # unknown block: best effort
 
 
 def _capture_thinking(resp: Any, ctx: RunContext) -> None:
@@ -235,7 +256,7 @@ def run_project(prompt: str, run_dir: Path | None = None, project: str = DEFAULT
             if getattr(b, "type", None) == "text" and (b.text or "").strip():
                 print("SCHOLAR:", b.text.strip()[:200])
 
-        messages.append({"role": "assistant", "content": [_block_dump(b) for b in resp.content]})
+        messages.append({"role": "assistant", "content": [_to_param(b) for b in resp.content]})
         stop_reason = getattr(resp, "stop_reason", None)
 
         if stop_reason == "tool_use":
