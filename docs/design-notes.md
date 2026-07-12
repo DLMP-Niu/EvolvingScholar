@@ -4,6 +4,18 @@ _Running log. Newest batch on top. Append dated batches; don't rewrite history._
 
 ---
 
+## 2026-07-11 (cont. 3) — Domain model corrected: two evolving scholars, per-run evolution
+
+Owner correction (mimicking real research): a **research project** (gene/disease) is a *container for many experiment runs*, not a "cycle." Evolution **accretes per experiment run, gated by PI feedback** — a run *with* a completed review → Loop C; a run *without* feedback is captured but **skipped**. And the two build arms are **two distinct evolving scholars** — `scholar_SDK` and `scholar_API` — each with its **own experience store** (their skills are endowment-coupled → no cross-pollination). A lab of many diverse AI interns is out of scope; the human panel is the reference.
+
+- Term **"cycle" retired** → **research project** (container) + **experiment run** (one scholar's Loop A pass). `CONTEXT.md` updated.
+- → [ADR-0014](adr/0014-two-evolving-scholars.md) (refines ADR-0010's shared-core into *shared mechanism + per-scholar store*).
+- **Restructure plan** → `docs/restructure-two-scholars.md` ("Build 5"): shared `data/`+`schemas/`+`harness/`+`common/` vs per-scholar `scholars/<id>/{engine,core,runs}`. Do before building arm 2.
+
+Also this session: **live-tested the SDK cycle runner end-to-end** (new → needs_more → complete) with real PI feedback; validated Build 4 (preflight + layer-2 fix); fixed `loop_c` `max_turns=1→6`.
+
+---
+
 ## 2026-07-11 (cont. 2) — Cycle runner + two capture/isolation fixes
 
 **Build 4 — the orchestration entrypoint (`runtime/cycle.py`).** Closes the "entrypoint to be created" gap in `runtime/README.md`. A human-in-the-loop state machine that advances one A→B→C cycle by exactly one step, deriving state from the run dir's `feedback_project.yaml` (unfilled → rebuild packet; `needs_more` → Loop A `--continue`; `complete` → Loop C). Reuses `run_project` / `build_review_packet` / `pending_tasks` / `load_final_feedback` / `run_loop_c` — sequencing only, no new loop logic. Codifies the operator flow from the previous batch into one command. The three sub-loop CLIs still work standalone.

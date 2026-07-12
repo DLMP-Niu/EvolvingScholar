@@ -17,3 +17,4 @@ Each ADR captures one consequential decision: its context, the decision, and the
 | [0011](0011-loop-a-tool-design.md) | Loop A tool design: minimal portable primitives, method withheld | Accepted |
 | [0012](0012-pilot-success-criteria.md) | Pilot success criteria (pre-registered: feasibility + directional evolution) | Accepted |
 | [0013](0013-iterative-within-cycle-review.md) | Iterative within-cycle review (task-additive) via session resume | Accepted |
+| [0014](0014-two-evolving-scholars.md) | Two evolving scholars (SDK, API), separated stores; per-run feedback-gated evolution | Accepted |

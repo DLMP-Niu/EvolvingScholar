@@ -3,13 +3,19 @@
 The canonical glossary for EvolvingScholar. **Terms only** — no implementation details or decisions (those live in `docs/adr/`). Keep this in sync as the language sharpens.
 
 ## Scholar
-The AI research intern under study — one per build arm. The subject whose capabilities and questioning we watch evolve.
+An evolving AI research intern — the subject whose capabilities and questioning we watch evolve. **This project builds TWO scholars, each evolving independently:**
+- **scholar_SDK** — built on the Claude Agent SDK (rich built-in tools; a "super-intern").
+- **scholar_API** — built on the raw Anthropic Messages API (minimal tools; a "basic agent that grows").
+
+They **share** an initial setup (cycle-0 persona, base prompt, seed questions) and the **dataset**, but each keeps its **own experience store** and evolves **independently — no cross-pollination** (their accumulated skills are endowment-coupled, so mixing would be incoherent and would blur each one's growth curve). See [ADR-0014](docs/adr/0014-two-evolving-scholars.md).
 
 ## Research project
-One gene–disease investigation (e.g. TTR/ATTR, PMP22/CMT). The scope of a single **cycle**. *(Supersedes the earlier informal term "pair.")*
+One gene–disease investigation (e.g. TTR/ATTR, PMP22/CMT). A **container for multiple experiment runs** — a scholar may run it many times (and re-run). Scholars need not run the same projects the same way. *(Supersedes the earlier informal term "pair.")*
 
-## Cycle
-One full research-project pass by the Scholar: **research → discuss → feedback → update**, completed before the next cycle begins. **One cycle = one research project.** Evolution and transfer are measured *across* cycles; the system update (Loop C) fires *between* cycles. *(Resolves ADR-0001…0011's loose use of "cycle"; supersedes "cohort/pair" ambiguity in ADR-0009.)*
+## Experiment run
+One Loop A research pass by **one scholar** on a research project (with optional within-run PI iteration via `--continue`, and re-runs). Evolution **accretes per run, per scholar, gated by PI feedback**: a run *with* a completed PI review → Loop C → updates that scholar's experience store; a run *without* feedback is **captured but skipped** for evolution.
+
+*(Deprecates **"cycle"**, which conflated "research project" with "one Loop A→B→C pass." The pass unit is an experiment run; the project is the container. Supersedes the "cycle = research project" framing and ADR-0009's cohort/pair wording — see [ADR-0014](docs/adr/0014-two-evolving-scholars.md).)*
 
 ## Cohort
 A specific patient group within a research project. May be **provided** (e.g. datasets A and B) or **identified by the Scholar** as part of the research (e.g. a stratified subgroup). A single research project may involve multiple cohorts. Two provided cohorts can come from different **data sources** (A = EMR, B = registry) — a difference that is itself an ascertainment consideration, not a difference in the term.
