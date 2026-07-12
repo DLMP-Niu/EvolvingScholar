@@ -12,6 +12,7 @@ resumes: the API arm replays the persisted message history rather than a session
 """
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -99,7 +100,7 @@ def advance(run_dir: Path | None, project: str = DEFAULT_PROJECT,
     elif state == "complete":
         load_final_feedback(run_dir)  # gate: status complete + entrustment level set (ADR-0013)
         print("[cycle] step: Loop C (system update)")
-        changed = run_loop_c(run_dir, CORE)
+        changed = asyncio.run(run_loop_c(run_dir, CORE))  # shared harness Loop C is async
         print(f"\n[cycle] DONE — run complete. {CORE.relative_to(REPO)}/ updated:")
         for c in changed:
             print("  -", c)
