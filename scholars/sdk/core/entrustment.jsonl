@@ -1,0 +1,2 @@
+{"cycle": 1, "run_id": "ttrA-20260711-135248", "ts": 1783798325.9868233, "overall_level": 2, "per_capability": {"emr-icd-hygiene-audit": 4, "emr-stratification": 3}}
+{"cycle": 1, "run_id": "ttrA-20260711-185206", "ts": 1783824993.645542, "overall_level": 1, "per_capability": {"emr-icd-hygiene-audit": 2, "emr-patient-phenotype-classification": 2, "emr-confounder-association-test": 2}}

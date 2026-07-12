@@ -1,6 +1,6 @@
 """Loop C — system update (the evolution mechanism). Build 3.
 
-Consumes a completed cycle (run + the PI's feedback) and makes ONE model call to
+Consumes a completed experiment run + the PI's feedback and makes ONE model call to
 distill them into proposed artifact updates (judgment — Rule 5), then writes them
 DETERMINISTICALLY to scholar_core/ as versioned diffs: skills/EPAs, strategy,
 knowledge, an error-ledger, and a revision-map entry.
@@ -44,18 +44,18 @@ BUILTIN_TOOLS = [
 PROPOSAL_SCHEMA = """{
   "revision_summary": "one sentence: what changed and why",
   "capability_updates": [{"name": "kebab-skill-name", "action": "create|append", "content": "markdown — a reusable method/EPA the Scholar demonstrated or was told to adopt"}],
-  "strategy_updates":   [{"name": "research-taste", "action": "append", "content": "a principle of good question/method design learned this cycle"}],
+  "strategy_updates":   [{"name": "research-taste", "action": "append", "content": "a principle of good question/method design learned this run"}],
   "knowledge_updates":  [{"name": "ttr-attr", "action": "append", "content": "a validated fact or data caveat"}],
-  "concept_model_updates": [{"name": "ttr-attr-model", "action": "append", "content": "how the disease concept-model changed this cycle (entities/links/corrections)"}],
+  "concept_model_updates": [{"name": "ttr-attr-model", "action": "append", "content": "how the disease concept-model changed this run (entities/links/corrections)"}],
   "goal_updates":          [{"name": "research-goals", "action": "append", "content": "how the research goal/direction advanced (goal autonomy)"}],
   "ledger_entries":     [{"error_type": "...", "detected_by": "PI|self|data", "root_cause": "...", "correction": "...", "artifact_change": "which skill/strategy this maps to"}],
-  "next_questions":     ["a seed question for the next cycle"]
+  "next_questions":     ["a seed question for the next run"]
 }"""
 
 LOOP_C_SYSTEM = (
     "You are the Loop C updater for an AI research intern (the Scholar). You do NOT do research. "
-    "You read one completed research cycle plus the PI's feedback, and distill them into concrete, "
-    "reusable updates to the Scholar's external artifacts, so it starts the next cycle better. "
+    "You read one completed experiment run plus the PI's feedback, and distill them into concrete, "
+    "reusable updates to the Scholar's external artifacts, so it starts the next run better. "
     "Prefer small, specific, reusable items (a method the Scholar can re-run; a principle; a data caveat). "
     "Turn each PI critique into a ledger entry with a correction. "
     "The feedback includes a 'development' section (growth dimensions + an entrustment level) — "
@@ -84,8 +84,8 @@ def _build_prompt(run_dir: Path, core: Path, feedback: dict[str, Any]) -> str:
     return (
         f"## Current Scholar capabilities (skill files that already exist)\n"
         f"{existing or '(none yet — this is early training)'}\n\n"
-        f"## This cycle's registered questions\n" + "\n".join(q_lines) + "\n\n"
-        f"## This cycle's report\n{report}\n\n"
+        f"## This run's registered questions\n" + "\n".join(q_lines) + "\n\n"
+        f"## This run's report\n{report}\n\n"
         f"## PI feedback (rubric scores + directives)\n"
         f"{yaml.safe_dump(feedback['review'], sort_keys=False)}\n\n"
         f"Now emit the JSON proposal."
@@ -112,15 +112,15 @@ async def _propose(prompt: str) -> dict[str, Any]:
     return _extract_json("".join(text))
 
 
-def _append_section(path: Path, cycle: int, run_id: str, content: str) -> None:
-    stamp = f"\n\n## cycle {cycle} · {run_id} · {datetime.now().date()}\n{content.strip()}\n"
+def _append_section(path: Path, run_no: int, run_id: str, content: str) -> None:
+    stamp = f"\n\n## run {run_no} · {run_id} · {datetime.now().date()}\n{content.strip()}\n"
     if path.exists():
         path.write_text(path.read_text() + stamp, encoding="utf-8")
     else:
         path.write_text(f"# {path.stem}\n{stamp}", encoding="utf-8")
 
 
-def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str,
+def apply_updates(proposal: dict[str, Any], core: Path, run_no: int, run_id: str,
                   entrustment: dict[str, Any] | None = None) -> list[str]:
     changed: list[str] = []
 
@@ -131,7 +131,7 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str,
             if it.get("action") == "create" and not path.exists():
                 path.write_text(f"# {name}\n\n{it.get('content','').strip()}\n", encoding="utf-8")
             else:
-                _append_section(path, cycle, run_id, it.get("content", ""))
+                _append_section(path, run_no, run_id, it.get("content", ""))
             changed.append(str(path.relative_to(core.parent)))
 
     write("capabilities", proposal.get("capability_updates", []))
@@ -144,22 +144,22 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str,
     ledger = core / "ledger" / "error_ledger.jsonl"
     with ledger.open("a", encoding="utf-8") as f:
         for e in proposal.get("ledger_entries", []) or []:
-            f.write(json.dumps({**e, "cycle": cycle, "run_id": run_id, "recurred_next_cycle": None}) + "\n")
+            f.write(json.dumps({**e, "run": run_no, "run_id": run_id, "recurred_next_run": None}) + "\n")
     if proposal.get("ledger_entries"):
         changed.append(str(ledger.relative_to(core.parent)))
 
-    # next-cycle question seeds
+    # next-run question seeds
     if proposal.get("next_questions"):
-        _append_section(core / "strategy" / "next_questions.md", cycle, run_id,
+        _append_section(core / "strategy" / "next_questions.md", run_no, run_id,
                         "\n".join(f"- {q}" for q in proposal["next_questions"]))
-        changed.append("scholar_core/strategy/next_questions.md")
+        changed.append(str((core / "strategy" / "next_questions.md").relative_to(core.parent)))
 
-    # entrustment progression — the intern->PI ladder recorded across cycles
+    # entrustment progression — the intern->PI ladder recorded across runs
     if entrustment and entrustment.get("overall_level") is not None:
         ent = core / "entrustment.jsonl"
         with ent.open("a", encoding="utf-8") as f:
             f.write(json.dumps({
-                "cycle": cycle, "run_id": run_id, "ts": time.time(),
+                "run": run_no, "run_id": run_id, "ts": time.time(),
                 "overall_level": entrustment.get("overall_level"),
                 "per_capability": entrustment.get("per_capability", {}),
             }) + "\n")
@@ -170,7 +170,7 @@ def apply_updates(proposal: dict[str, Any], core: Path, cycle: int, run_id: str,
     with rev.open("a", encoding="utf-8") as f:
         f.write(json.dumps({
             "revision_id": f"rev-{run_id}",
-            "cycle": cycle, "run_id": run_id, "ts": time.time(),
+            "run": run_no, "run_id": run_id, "ts": time.time(),
             "trigger": "pi_feedback",
             "summary": proposal.get("revision_summary", ""),
             "targets": sorted(set(changed)),
@@ -183,11 +183,11 @@ async def run_loop_c(run_dir: str | Path, core: Path = REPO / "scholars" / "sdk"
     run_dir = Path(run_dir)
     feedback = load_final_feedback(run_dir)  # gate: status complete + entrustment set
     meta = yaml.safe_load((run_dir / "meta.yaml").read_text())
-    cycle = int(meta.get("cycle", 1))
+    run_no = int(meta.get("run", meta.get("cycle", 1)))
     run_id = meta.get("run_id", run_dir.name)
     proposal = await _propose(_build_prompt(run_dir, core, feedback))
     entrustment = feedback["review"].get("development", {}).get("entrustment")
-    changed = apply_updates(proposal, Path(core), cycle, run_id, entrustment)
+    changed = apply_updates(proposal, Path(core), run_no, run_id, entrustment)
     print(f"[loop_c] revision: {proposal.get('revision_summary','')}")
     print("[loop_c] wrote:")
     for c in changed:

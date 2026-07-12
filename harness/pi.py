@@ -5,8 +5,8 @@ Given a Loop A run, `build_review_packet()` assembles a human-readable packet
 for the human PI to fill; `load_feedback()` validates the completed form. Loop C
 (Build 3) consumes it.
 
-This is the WITHIN-cycle (project) review — scores the research work. The
-between-cycle development/entrustment review is a later step. Rubric mirrors
+This is the WITHIN-run (project) review — scores the research work. The
+cross-run development/entrustment review is a later step. Rubric mirrors
 `schemas/review_rubric_project.md`.
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from reconcile import reconcile  # noqa: E402
 
-# Within-cycle project rubric dimensions — mirrors schemas/review_rubric_project.md.
+# Within-run project rubric dimensions — mirrors schemas/review_rubric_project.md.
 # NOTE: grilling + the real intern's PI feedback recommend adding research_framing,
 # source_quality, method_sequencing, bias_awareness — add here AND in the schema doc
 # together when that rubric is formalized (kept in sync deliberately).
@@ -36,7 +36,7 @@ REVIEW_DIMENSIONS = [
     "self_correction",
 ]
 
-# Between-cycle development/entrustment dimensions (schemas/review_rubric_development.md).
+# Cross-run development/entrustment dimensions (schemas/review_rubric_development.md).
 # Filled only at project completion — the combined final review that feeds Loop C.
 DEVELOPMENT_DIMENSIONS = [
     "concept_model_growth",
@@ -63,7 +63,7 @@ def build_review_packet(run_dir: str | Path) -> dict[str, Path]:
     acts = {n["q_id"]: len(n["actions"]) for n in traj["nodes"]}
     lines = [
         f"# PI Review Packet — {meta.get('run_id', run_dir.name)}",
-        f"\n**Cohort:** {meta.get('cohort')}  ·  **Cycle:** {meta.get('cycle')}",
+        f"\n**Scholar:** {meta.get('scholar')}  ·  **Project:** {meta.get('project')}  ·  **Cohort:** {meta.get('cohort')}  ·  **Run:** {meta.get('run', meta.get('cycle'))}",
         f"\n**Seed:** {str(meta.get('seed_question', '')).strip()}",
         "\n## Registered questions (trajectory)",
     ]
@@ -89,12 +89,14 @@ def build_review_packet(run_dir: str | Path) -> dict[str, Path]:
             "review": {
                 "type": "project",
                 "run_id": meta.get("run_id", run_dir.name),
+                "scholar": meta.get("scholar"),
+                "project": meta.get("project"),
                 "cohort": meta.get("cohort"),
-                "cycle": meta.get("cycle"),
+                "run": meta.get("run", meta.get("cycle")),
                 "reviewer": "owner",
                 "scores": {d: {"score": None, "note": ""} for d in REVIEW_DIMENSIONS},
                 "directives": [{"q_id": q["q_id"], "directive": ""} for q in questions],
-                # Iterative within-cycle review (ADR-0013): set status to 'needs_more'
+                # Iterative within-run review (ADR-0013): set status to 'needs_more'
                 # and list new_tasks to send the Scholar back for a partial re-run;
                 # set 'complete' when the project is done and ready for Loop C.
                 "status": "needs_more",
@@ -141,7 +143,7 @@ def load_final_feedback(run_dir: str | Path) -> dict[str, Any]:
 
 
 def pending_tasks(run_dir: str | Path) -> list[str] | None:
-    """The PI's newly-assigned tasks if the within-cycle review asked for more work
+    """The PI's newly-assigned tasks if the within-run review asked for more work
     (status: needs_more), else None (project complete / no tasks). Drives
     `loop_a.py --continue` (ADR-0013)."""
     fb_path = Path(run_dir) / "feedback_project.yaml"

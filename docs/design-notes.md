@@ -4,6 +4,18 @@ _Running log. Newest batch on top. Append dated batches; don't rewrite history._
 
 ---
 
+## 2026-07-11 (cont. 4) — Build 5 complete: two-scholar layout + common/ + cycle→run
+
+Branch `build/two-scholars`. Realizes ADR-0014 in full — done in two commits (structural move, then the parts I'd deferred):
+
+- **Per-scholar layout:** `scholars/sdk/` = scholar_SDK's `engine.py` + `core/` + `runs/`; `harness/`, `data/`, `schemas/` stay shared. `experiments/` trimmed to cross-scholar `results/`.
+- **`common/`:** SDK-free primitives extracted (`capture`, `emr_tools`, `scholar_io`, `projects`, `prompts`, `preflight`, `persona.md`); SDK glue consolidated into `scholars/sdk/engine.py`. This is the seam arm 2 imports through (no SDK dependency).
+- **`cycle`→`run` retired in code:** `meta.yaml`/capture/ledgers now use `run` + `project` + `scholar`; readers fall back to the old `cycle` for the kept artifacts. **Project registry** (`common/projects.py`) makes cohort A **or** B runnable; **run index** auto-increments from the scholar's revision history; **no-feedback runs** are a supported skip (`cycle.py --skip`).
+- **SDK store kept** (owner reviewed the results) — moved intact; `next_run_no` reads it → next run is #4.
+- Verified: compile + import graph; 2 live Loop A runs; `pi` packet + skip + isolated `apply_updates`. Plan: `docs/restructure-two-scholars.md` (status: COMPLETE).
+
+---
+
 ## 2026-07-11 (cont. 3) — Domain model corrected: two evolving scholars, per-run evolution
 
 Owner correction (mimicking real research): a **research project** (gene/disease) is a *container for many experiment runs*, not a "cycle." Evolution **accretes per experiment run, gated by PI feedback** — a run *with* a completed review → Loop C; a run *without* feedback is captured but **skipped**. And the two build arms are **two distinct evolving scholars** — `scholar_SDK` and `scholar_API` — each with its **own experience store** (their skills are endowment-coupled → no cross-pollination). A lab of many diverse AI interns is out of scope; the human panel is the reference.

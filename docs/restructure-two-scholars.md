@@ -2,13 +2,17 @@
 
 Plan for the directory/code restructure that realizes [ADR-0014](adr/0014-two-evolving-scholars.md): **shared foundation + mechanism, per-scholar engine + experience.** Do this *before* building `scholar_API`, while only `scholar_SDK` (arm 1) exists to move. The pilot keeps working throughout (it's a move + reimport + retest).
 
-## Status (branch `build/two-scholars`)
-**Done — structural separation** (the code move; logic unchanged): `runtime/` → `scholars/sdk/`, `scholar_core/` → `scholars/sdk/core/`, old runs → `scholars/sdk/runs/`, path fixups, `.gitignore`, `experiments/` trimmed to shared `results/`. Verified: compile + import graph + one live `scholar_SDK` Loop A run (all four capture layers → `scholars/sdk/runs/`).
+## Status (branch `build/two-scholars`) — COMPLETE
 
-**Deferred (deliberately, to keep the move low-risk):**
-- **`common/` pure-extraction** — the SDK modules stay whole under `scholars/sdk/`; splitting pure cores into `common/` is folded into the **arm-2 build** (arm 2 triggers the real need). Until then `scholars/sdk/` holds both pure + glue.
-- **Terminology/behavior changes** (`cycle`→`run`+`project` in `meta.yaml`, project registry, explicit no-feedback-skip state) — a **separate follow-up**; not required for the structural separation and touches the runner's state logic.
-- **Clear-vs-keep the SDK store** — the held evolution artifacts were **moved, not cleared** (non-destructive). Clearing for a clean start remains an open one-command decision.
+**1. Structural separation** ✅ `runtime/` → `scholars/sdk/`, `scholar_core/` → `scholars/sdk/core/`, old runs → `scholars/sdk/runs/`, `.gitignore`, `experiments/` trimmed to shared `results/`.
+
+**2. `common/` pure-extraction** ✅ SDK-free cores split out (`capture`, `emr_tools`, `scholar_io`, `projects`, `prompts`, `preflight`, `persona.md`); SDK glue consolidated into `scholars/sdk/engine.py` (was `loop_a`+`capture`+`tools`). `common/` imports no SDK, so arm 2 reuses it directly.
+
+**3. Terminology + behavior** ✅ `cycle`→`run`+`project`+`scholar` in `meta.yaml`/capture/ledgers (readers tolerate the retired `cycle` on kept artifacts); **project registry** (`common/projects.py`) makes cohort A **or** B runnable; **run index** auto-increments from the scholar's revision history (`next_run_no`); **no-feedback-skip** is a supported outcome (`cycle.py --skip`).
+
+**4. SDK store** ✅ **kept** (owner reviewed the results) — moved intact, not cleared; `next_run_no` reads it (→ run 4).
+
+Verified: compile + full import graph; two live `scholar_SDK` Loop A runs (`is_error=False`, all four capture layers + `meta` scholar/project/run → `scholars/sdk/runs/`); `pi` packet + `--skip` + isolated `apply_updates` (ledgers write `run`, paths relative). Ready to build `scholars/api/` with no further restructuring.
 
 ## Target layout
 ```
