@@ -100,7 +100,7 @@ async def _propose(prompt: str) -> dict[str, Any]:
         disallowed_tools=BUILTIN_TOOLS,
         setting_sources=["project"],
         permission_mode="bypassPermissions",
-        max_turns=1,
+        max_turns=6,  # headroom for one JSON completion; no tools, so no runaway (max_turns=1 was too tight)
         env={"CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"},
     )
     text: list[str] = []
