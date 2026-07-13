@@ -5,7 +5,7 @@ How the AI intern's questioning is recorded during a Loop A run. Captures **all 
 ## Run-folder layout
 
 ```
-experiments/runs/<run_id>/
+scholars/<id>/runs/<run_id>/
   meta.yaml            # seed, model, artifact version, config snapshot, timestamps
   report.md            # the 7-question deliverable (human-comparable surface)
   questions.jsonl      # LAYER 4 — register_question tool calls  (PRIMARY analysis)

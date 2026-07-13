@@ -8,7 +8,7 @@ The AI intern's questioning can be recorded at four levels: (1) the full message
 
 ## Decision
 
-Capture **all four** layers per run into `experiments/runs/<run_id>/` (see `schemas/capture_layer.md`), with two qualifications:
+Capture **all four** layers per run into `experiments/runs/<run_id>/` — now `scholars/<id>/runs/<run_id>/` per [ADR-0014](0014-two-evolving-scholars.md) (see `schemas/capture_layer.md`), with two qualifications:
 
 - Layers 1-3 are **passive** (no behavioral effect) — always on.
 - Layer 4 is **active** (mild observer effect) — captured, but treated as an experimental variable: ablated on a subset of repetitions to quantify its distortion.

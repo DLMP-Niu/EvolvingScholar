@@ -39,10 +39,11 @@ Knowledge sits *below* this stack, saturated and roughly constant — everything
 ## Repo map
 
 ```
-scholar_core/   the intern (versioned — its git history = the evolution record)
+scholars/<id>/  the two evolving scholars (sdk, api): engine.py + core/ (versioned — git history = the evolution record) + runs/
+common/         shared SDK-free primitives: capture, EMR tools, prompts, projects, persona
 harness/        shared experiment machinery: PI mentor, Loop C updater, evaluator
-runtime/        orchestration entrypoint(s)
-experiments/    run configs, logs, results (the scientific data)
+schemas/        record schemas: capture layers, question registry, review rubrics
+experiments/    cross-scholar analysis outputs (results/): trajectories, transfer matrix, plots
 data/           synthetic EMR + curated literature for the pilot
 docs/           the build record: design log, ADRs, this structure doc, references
 ```
