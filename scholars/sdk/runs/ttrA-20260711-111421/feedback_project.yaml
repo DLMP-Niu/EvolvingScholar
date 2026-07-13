@@ -1,0 +1,37 @@
+review:
+  type: project
+  run_id: ttrA-20260711-111421
+  cohort: A
+  cycle: 1
+  reviewer: owner
+  scores:
+    literature_grounding:
+      score: 2
+      note: "No literature this cycle (tool unavailable). Establish guideline reference values (age of onset, cardiac vs neuropathic frequency, ATTRv vs wild-type proportion) BEFORE claiming EMR confirms literature."
+    citation_integrity:
+      score: 5
+      note: "No hallucinated references — correctly stated literature was unavailable."
+    data_analysis_validity:
+      score: 4
+      note: "Strong QC. Define phenotype code lists from a guideline/reference, not ad hoc, to avoid the circularity you noted."
+    numerical_sanity:
+      score: 4
+      note: "Caught impossible values and junk codes."
+    reasoning_quality:
+      score: 4
+      note: "Sound; engaged the definitional-circularity problem honestly."
+    hypothesis_quality:
+      score: 3
+      note: "Characterization only — no novel testable hypothesis yet."
+    escalation_appropriateness:
+      score: 4
+      note: "Good L3->L5 escalation from characterization to stratification."
+    self_correction:
+      score: 5
+      note: "Excellent — caught compound codes, erroneous-encounter junk, casing, and flagged its own circular phenotype definitions unprompted."
+  directives:
+    - q_id: ttrA-20260711-111421-q0001
+      directive: "Before characterizing, pull guideline reference values (expected age of onset, cardiac vs neuropathic frequency) so 'does EMR confirm literature' has a benchmark."
+    - q_id: ttrA-20260711-111421-q0002
+      directive: "Next cycle: stratify by comorbid diabetes (glucose labs) — the confounder question — and watch ascertainment bias between cohorts."
+  overall_note: "Strong data rigor and honesty for a first cycle. Growth edges: (1) establish literature/guideline reference values first; (2) move toward a testable hypothesis (diabetes comorbidity). Promote your EMR data-cleaning routine to a reusable skill."

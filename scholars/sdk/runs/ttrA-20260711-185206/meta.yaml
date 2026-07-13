@@ -1,0 +1,20 @@
+run_id: ttrA-20260711-185206
+cohort: A
+cycle: 1
+started: '2026-07-11T18:52:06.810383'
+seed_question: "Seed question: Using cohort A's EMR data, characterize the TTR / hereditary\
+  \ ATTR amyloidosis cohort \u2014 how many patients are there, what are the most\
+  \ frequent diagnoses, and is the expected cardiac vs. neuropathic phenotype present\
+  \ among amyloidosis (ICD E85.x) patients?"
+turns:
+- resumed: false
+  prompt: "Seed question: Using cohort A's EMR data, characterize the TTR / hereditary\
+    \ ATTR amyloidosis cohort \u2014 how many patients are there, what are the most\
+    \ frequent diagnoses, and is the expected cardiac vs."
+  at: '2026-07-11T18:52:06.810395'
+- resumed: true
+  prompt: "Your PI reviewed your work and assigned these additional tasks. Address\
+    \ ONLY what is needed, reusing your prior work \u2014 do not redo settled analyses.\
+    \ Register any new questions, run needed analyses, th"
+  at: '2026-07-11T21:07:58.060471'
+session_id: 2f604222-3ff0-48fe-9a4a-071ef82cf05a

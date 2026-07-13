@@ -1,0 +1,13 @@
+run_id: ttrA-api-20260712-092359
+scholar: api
+project: TTR-ATTR
+cohort: A
+run: 1
+repo: /home/nthink/EvolvingScholar
+cohort_dir: /home/nthink/EvolvingScholar/data/synthetic_ttr_REACTSP_tsv_datasets
+model: claude-opus-4-8
+max_tokens: 16000
+endowment: 'raw-messages-api (minimal: run_analysis/register_question/save_report;
+  no web)'
+thinking: adaptive
+resumed: false

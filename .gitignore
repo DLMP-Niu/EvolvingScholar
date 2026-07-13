@@ -21,9 +21,12 @@ data/*
 !data/README.md
 !data/.gitkeep
 
-# Per-scholar run outputs (regenerable capture data; can be large) — keep the dir, not the runs.
-scholars/*/runs/*/
-!scholars/*/runs/.gitkeep
+# Per-scholar run outputs — keep readable results + provenance (report, review, feedback,
+# meta, questions, config); ignore only the bulky raw capture layers.
+scholars/*/runs/*/transcript.jsonl
+scholars/*/runs/*/messages.jsonl
+scholars/*/runs/*/thinking.jsonl
+scholars/*/runs/*/actions.jsonl
 
 # OS / WSL
 .DS_Store

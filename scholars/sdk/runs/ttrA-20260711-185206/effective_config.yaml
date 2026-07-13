@@ -1,0 +1,32 @@
+run_id: ttrA-20260711-185206
+cohort: A
+cycle: 1
+repo: /home/nthink/EvolvingScholar
+cohort_dir: /home/nthink/EvolvingScholar/data/synthetic_ttr_REACTSP_tsv_datasets
+setting_sources:
+- project
+permission_mode: bypassPermissions
+allowed_tools:
+- mcp__scholar__register_question
+- mcp__scholar_tools__run_analysis
+- mcp__scholar_tools__save_report
+- WebSearch
+- WebFetch
+disallowed_tools:
+- Bash
+- Read
+- Write
+- Edit
+- NotebookEdit
+- Glob
+- Grep
+- Task
+- ToolSearch
+- TodoWrite
+- BashOutput
+- KillShell
+- Skill
+- ExitPlanMode
+disable_auto_memory: true
+thinking_capture: true
+resumed: true

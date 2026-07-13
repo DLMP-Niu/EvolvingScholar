@@ -1,0 +1,32 @@
+review:
+  type: project
+  run_id: ttrA-20260711-135248
+  cohort: A
+  cycle: 1
+  reviewer: owner
+  scores:
+    literature_grounding: {score: 3, note: "used web benchmarks this time — good"}
+    citation_integrity: {score: 5, note: "no hallucinated refs"}
+    data_analysis_validity: {score: 4, note: "applied hygiene skill up front"}
+    numerical_sanity: {score: 5, note: "ran the formal chi-square when asked"}
+    reasoning_quality: {score: 4, note: "honest about the null result"}
+    hypothesis_quality: {score: 4, note: "diabetes hypothesis was testable"}
+    escalation_appropriateness: {score: 4, note: "L3->L5->L6 progression"}
+    self_correction: {score: 5, note: "reversed its own directional claim after the formal test"}
+  directives:
+    - q_id: ttrA-20260711-135248-q0004
+      directive: "Good. Carry the diabetes-confounder method forward to cohort B."
+  status: complete
+  new_tasks: []
+  development:
+    scores:
+      concept_model_growth: {score: 4, note: "disease model now includes diabetes as a competing neuropathy cause"}
+      questioning_maturation: {score: 5, note: "reached L6 discrepancy question with a formal test"}
+      hypothesis_logic: {score: 4, note: "converted a confounder into a falsifiable test"}
+      method_repertoire: {score: 5, note: "reused hygiene + anti-circularity skills from cycle 1"}
+      goal_autonomy: {score: 3, note: "still PI-nudged toward the formal test"}
+      error_recurrence: {score: 5, note: "no recurrence of the circular-definition error"}
+    entrustment:
+      overall_level: 2
+      per_capability: {emr-icd-hygiene-audit: 4, emr-stratification: 3}
+  overall_note: "Clear growth: applied prior skills proactively and self-corrected under a formal test. Advance to level-2 entrustment; next, transfer to cohort B."

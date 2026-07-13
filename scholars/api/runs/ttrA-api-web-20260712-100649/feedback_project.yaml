@@ -1,0 +1,64 @@
+review:
+  type: project
+  run_id: ttrA-api-web-20260712-100649
+  scholar: api
+  project: TTR-ATTR
+  cohort: A
+  run: 1
+  reviewer: owner
+  scores:
+    literature_grounding:
+      score: 3
+      note: 'did perform web search'
+    citation_integrity:
+      score: 2
+      note: 'cited but not a good link or publication ID'
+    data_analysis_validity:
+      score: 2
+      note: 'Compared data by occurance and also ICD system'
+    numerical_sanity:
+      score: 3
+      note: 'Look in range'
+    reasoning_quality:
+      score: 3
+      note: 'Same observation with different interpreation'
+    hypothesis_quality:
+      score: 2
+      note: ''
+    escalation_appropriateness:
+      score: null
+      note: ''
+    self_correction:
+      score: 2
+      note: 'All stat need well documentation of bias and assumptions'
+  directives:
+  - q_id: ttrA-api-web-20260712-100649-q0001
+    directive: ''
+  - q_id: ttrA-api-web-20260712-100649-q0002
+    directive: ''
+  status: complete
+  new_tasks: []
+  development:
+    scores:
+      concept_model_growth:
+        score: null
+        note: ''
+      questioning_maturation:
+        score: null
+        note: ''
+      hypothesis_logic:
+        score: null
+        note: ''
+      method_repertoire:
+        score: null
+        note: ''
+      goal_autonomy:
+        score: null
+        note: ''
+      error_recurrence:
+        score: null
+        note: ''
+    entrustment:
+      overall_level: 2
+      per_capability: {}
+  overall_note: ''

@@ -1,0 +1,71 @@
+review:
+  type: project
+  run_id: ttrA-20260711-185206
+  cohort: A
+  cycle: 1
+  reviewer: owner
+  scores:
+    literature_grounding:
+      score: 3
+      note: basic information
+    citation_integrity:
+      score: 5
+      note: all real citation
+    data_analysis_validity:
+      score: 3
+      note: used cohort summary
+    numerical_sanity:
+      score: 3
+      note: Coumpoun-cod rows should not be ignored. Code to breakdown
+    reasoning_quality:
+      score: 4
+      note: used literature to compare cohort pertengate observations
+    hypothesis_quality:
+      score: 3
+      note: Mixture group is of interest to followup
+    escalation_appropriateness:
+      score: null
+      note: ''
+    self_correction:
+      score: 3
+      note: 'consider stat but not necessily assumptions'
+  directives:
+  - q_id: ttrA-20260711-185206-q0001
+    directive: ''
+  - q_id: ttrA-20260711-185206-q0002
+    directive: ''
+  - q_id: ttrA-20260711-185206-q0003
+    directive: ''
+  status: complete
+  new_tasks:
+  - 'Run the diabetes (E11) – neuropathy confounder test on the N=206 cohort: does
+    comorbid diabetic polyneuropathy inflate the 43% neuro rate?'
+  - Quantify the mixed-phenotype under-detection vs the 83% literature benchmark.
+  development:
+    scores:
+      concept_model_growth:
+        score: 3
+        note: 'literature search may review new hypotheis for test using EMR'
+      questioning_maturation:
+        score: 1
+        note: ''
+      hypothesis_logic:
+        score: 2
+        note: 'Dataframe for grouping'
+      method_repertoire:
+        score: 3
+        note: 'some reuseable logics'
+      goal_autonomy:
+        score: 1
+        note: 'broader questions evaluation needed'
+      error_recurrence:
+        score: 5
+        note: 'not observed'
+    entrustment:
+      overall_level: 1
+      per_capability: {
+        emr-icd-hygiene-audit: 2,
+        emr-patient-phenotype-classification: 2,
+        emr-confounder-association-test: 2
+        }
+  overall_note: 'Starting point of literature adn EMR joint analysis'

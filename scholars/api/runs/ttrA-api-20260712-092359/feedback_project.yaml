@@ -1,0 +1,66 @@
+review:
+  type: project
+  run_id: ttrA-api-20260712-092359
+  scholar: api
+  project: TTR-ATTR
+  cohort: A
+  run: 1
+  reviewer: owner
+  scores:
+    literature_grounding:
+      score: null
+      note: ''
+    citation_integrity:
+      score: null
+      note: ''
+    data_analysis_validity:
+      score: null
+      note: ''
+    numerical_sanity:
+      score: null
+      note: ''
+    reasoning_quality:
+      score: null
+      note: ''
+    hypothesis_quality:
+      score: null
+      note: ''
+    escalation_appropriateness:
+      score: null
+      note: ''
+    self_correction:
+      score: null
+      note: ''
+  directives:
+  - q_id: ttrA-api-20260712-092359-q0001
+    directive: ''
+  - q_id: ttrA-api-20260712-092359-q0002
+    directive: ''
+  - q_id: ttrA-api-20260712-092359-q0003
+    directive: ''
+  status: needs_more
+  new_tasks: []
+  development:
+    scores:
+      concept_model_growth:
+        score: null
+        note: ''
+      questioning_maturation:
+        score: null
+        note: ''
+      hypothesis_logic:
+        score: null
+        note: ''
+      method_repertoire:
+        score: null
+        note: ''
+      goal_autonomy:
+        score: null
+        note: ''
+      error_recurrence:
+        score: null
+        note: ''
+    entrustment:
+      overall_level: null
+      per_capability: {}
+  overall_note: ''
