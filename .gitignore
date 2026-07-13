@@ -34,3 +34,6 @@ scholars/*/runs/*/actions.jsonl
 
 # git bundles (transfer artifacts from cloud plan hand-offs)
 *.bundle
+
+# Talk deck — heavy standalone build (bundled fonts/runtime + duplicate GIFs); not uploaded.
+docs/demo/talk/

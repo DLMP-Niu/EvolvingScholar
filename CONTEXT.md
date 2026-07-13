@@ -3,7 +3,7 @@
 The canonical glossary for EvolvingScholar. **Terms only** — no implementation details or decisions (those live in `docs/adr/`). Keep this in sync as the language sharpens.
 
 ## Scholar
-An evolving AI research intern — the subject whose capabilities and questioning we watch evolve. **This project builds TWO scholars, each evolving independently:**
+An evolving **AI Scholar Agent** (an AI research agent) — the subject whose capabilities and questioning we watch evolve. Learns by mimicking a human learner; "intern / trainee" is the *analogy*, not the label. **This project builds TWO scholars, each evolving independently:**
 - **scholar_SDK** — built on the Claude Agent SDK (rich built-in tools; a "super-intern").
 - **scholar_API** — built on the raw Anthropic Messages API (minimal tools; a "basic agent that grows").
 
