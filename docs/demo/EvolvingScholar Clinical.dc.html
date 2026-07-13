@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  @keyframes esFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes esPop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+  a{color:#0F7A6E}
+  a:hover{color:#0A5A51}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="Hook" data-screen-label="01 Hook" data-speaker-notes="Can an AI intern climb the same competency ladder a clinician does? EvolvingScholar learns the way a trainee does — mentor-guided, project by project — and we can measure how far up the ladder it climbs." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 150px 110px">
+      <div style="font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:34px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>A question for a trainee</div>
+      <h1 style="font-family:'Newsreader',serif;font-weight:600;font-size:96px;line-height:1.04;letter-spacing:-.015em;margin:0 0 34px;max-width:20ch;text-wrap:balance">Can an AI intern climb the <em style="font-style:italic;color:#0F7A6E">same competency ladder</em> a clinician does?</h1>
+      <p style="font-size:32px;line-height:1.5;color:#47535E;max-width:56ch;margin:0">EvolvingScholar is an AI research intern that learns the way a trainee does — guided by a mentor, project by project — and we can <b style="color:#20272E;font-weight:600">measure how far up the ladder it climbs</b>.</p>
+    </div>
+  </section>
+
+  <section data-label="Premise" data-screen-label="02 Premise" data-speaker-notes="The question posed to a real research intern on day one: review five years of literature on gene A and disease B, study the largest US cohort — how far toward true expertise does that take you? We read the growth as a trajectory, not a claim of human-equivalent expertise." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 150px 110px">
+      <div style="font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:34px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>Where this started</div>
+      <div style="font-family:'Newsreader',serif;font-style:italic;font-size:52px;line-height:1.4;color:#20272E;max-width:28ch;border-left:3px solid #0F7A6E;padding-left:38px;margin:8px 0">"Review five years of literature on gene A and disease B, and study the largest US patient cohort. How far toward true expertise does that take you?"</div>
+      <p style="color:#7A8791;font-size:26px;margin-top:34px">— the question posed to a real research intern, on day one</p>
+      <p style="color:#7A8791;font-size:24px;margin-top:44px;max-width:56ch;line-height:1.5">EvolvingScholar lets us run that project quickly across many classic clinical-genetics diseases — and read the growth as a <b style="color:#0A5A51">trajectory, not a claim</b> of human-equivalent expertise.</p>
+    </div>
+  </section>
+
+  <section data-label="Workflow" data-screen-label="03 Workflow" data-speaker-notes="How it learns: study the literature against a real EMR cohort, a mentor gives feedback at rounds and assigns an entrustment level, then it earns EPAs it carries into the next project. The same loop runs for two scholars — a rich-tool SDK arm and a minimal secure API arm." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 120px 70px">
+      <div style="font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>How it learns</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:600;font-size:52px;line-height:1.1;letter-spacing:-.01em;margin:0 0 30px;max-width:26ch">Literature to real-world cohort — then a mentor weighs in.</h2>
+
+      <div style="display:flex;align-items:stretch;gap:18px">
+        <div style="flex:1;background:#FFFFFF;border:1px solid #E4DDD1;border-radius:16px;padding:26px 28px;box-shadow:0 1px 3px rgba(32,39,46,.05);animation:esPop .5s ease .08s both">
+          <div style="font-family:'Newsreader',serif;font-size:24px;color:#0F7A6E;font-weight:600">Study</div>
+          <div style="font-weight:600;margin:14px 0 8px;font-size:23px">Loop A · Research</div>
+          <p style="color:#7A8791;font-size:18px;line-height:1.5;margin:0">Reviews the literature, then tests it against a real EMR patient cohort — raising and answering its own questions.</p>
+        </div>
+        <span style="align-self:center;font-size:30px;color:#C9BCA6">→</span>
+        <div style="flex:1;background:#FFFFFF;border:1px solid #E4DDD1;border-radius:16px;padding:26px 28px;box-shadow:0 1px 3px rgba(32,39,46,.05);animation:esPop .5s ease .22s both">
+          <div style="font-family:'Newsreader',serif;font-size:24px;color:#0F7A6E;font-weight:600">Rounds</div>
+          <div style="font-weight:600;margin:14px 0 8px;font-size:23px">Loop B · PI feedback</div>
+          <p style="color:#7A8791;font-size:18px;line-height:1.5;margin:0">A mentor reviews the work on a rubric and assigns an entrustment level.</p>
+        </div>
+        <span style="align-self:center;font-size:30px;color:#C9BCA6">→</span>
+        <div style="flex:1;background:#E6F1EE;border:1px solid #0F7A6E;border-radius:16px;padding:26px 28px;box-shadow:0 4px 18px rgba(15,122,110,.12);animation:esPop .5s ease .36s both">
+          <div style="font-family:'Newsreader',serif;font-size:24px;color:#0F7A6E;font-weight:600">Grow</div>
+          <div style="font-weight:600;margin:14px 0 8px;font-size:23px;color:#0A5A51">Loop C · Evolve</div>
+          <p style="color:#47535E;font-size:18px;line-height:1.5;margin:0">Earns new <b style="color:#0F7A6E">EPAs</b> — capabilities it carries into the next project.</p>
+        </div>
+      </div>
+
+      <div style="position:relative;height:46px;margin:0 90px;border:2px solid #D8CFC0;border-top:0;border-radius:0 0 18px 18px;animation:esFade .5s ease .5s both">
+        <span style="position:absolute;left:-2px;top:0;transform:translate(-6px,-100%);border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:10px solid #0F7A6E"></span>
+        <span style="position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);background:#FBF9F5;padding:0 18px;color:#7A8791;font-size:18px;white-space:nowrap">new capabilities carry into the next project — growth read as a <span style="color:#0A5A51">trajectory</span></span>
+      </div>
+
+      <div style="display:flex;gap:34px;align-items:flex-start;margin-top:26px">
+        <p style="flex:1;color:#7A8791;font-size:19px;line-height:1.5;margin:0"><b style="color:#0A5A51">EPA</b> — Entrustable Professional Activity: a unit of clinical work a trainee can be trusted to perform. It is how real competence is credentialed in medicine.</p>
+        <div style="flex:1;display:flex;gap:14px">
+          <div style="flex:1;background:#FFFFFF;border:1px solid #E4DDD1;border-radius:12px;padding:16px 18px">
+            <div style="font-weight:600;color:#0A5A51;font-size:18px">Scholar 1 · SDK</div>
+            <div style="color:#7A8791;font-size:16px;margin-top:5px;line-height:1.4">Rich built-in tools — the "super-intern"</div>
+          </div>
+          <div style="flex:1;background:#FFFFFF;border:1px solid #E4DDD1;border-radius:12px;padding:16px 18px">
+            <div style="font-weight:600;color:#B9852F;font-size:18px">Scholar 2 · API</div>
+            <div style="color:#7A8791;font-size:16px;margin-top:5px;line-height:1.4">Minimal tools, secure environment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Directory" data-screen-label="04 Directory" data-speaker-notes="Where the intern's growth is kept. each scholar's core/ holds the intern's evolving state — its persona, goals, concept model of the disease, and its earned capabilities (EPAs). The git history of that one folder is the revision map: the trainee's transcript." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 150px 70px">
+      <div style="font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>The trainee's transcript</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:600;font-size:52px;line-height:1.08;letter-spacing:-.01em;margin:0 0 30px;max-width:28ch">One folder holds everything the intern has learned.</h2>
+
+      <div style="display:flex;gap:40px;align-items:flex-start">
+        <div style="flex:1.3;background:#FFFFFF;border:1px solid #E4DDD1;border-radius:16px;padding:28px 32px;box-shadow:0 1px 3px rgba(32,39,46,.05);font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:19px;line-height:1.9">
+          <div style="color:#47535E">EvolvingScholar/</div>
+          <div style="background:#E6F1EE;border:1px solid #0F7A6E;border-left:3px solid #0F7A6E;border-radius:8px;padding:14px 18px;margin:6px 0">
+            <div style="color:#0A5A51;font-weight:600">├── scholars/&lt;id&gt;/core/ &nbsp;<span style="font-family:'Inter',sans-serif;font-weight:600;color:#0F7A6E">the intern's evolving state</span></div>
+            <div style="color:#0F7A6E">│   ├── persona.md &nbsp;&nbsp;<span style="color:#7A8791">who it is</span></div>
+            <div style="color:#0F7A6E">│   ├── goals/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7A8791">research aims</span></div>
+            <div style="color:#0F7A6E">│   ├── strategy/ &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7A8791">how it designs questions</span></div>
+            <div style="color:#0F7A6E">│   ├── concept_model/ <span style="color:#7A8791">its model of the disease</span></div>
+            <div style="color:#B9852F;font-weight:600">│   ├── capabilities/ &nbsp;<span style="color:#0A5A51;font-family:'Inter',sans-serif">← earned EPAs</span></div>
+            <div style="color:#0F7A6E">│   ├── knowledge/ &nbsp;&nbsp;<span style="color:#7A8791">validated facts</span></div>
+            <div style="color:#0F7A6E">│   └── ledger/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7A8791">mistakes &amp; corrections</span></div>
+          </div>
+          <div style="color:#B7AB99">├── harness/ &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#A99C88">the mentor &amp; evolve machinery</span></div>
+          <div style="color:#B7AB99">├── experiments/ <span style="color:#A99C88">cross-scholar results</span></div>
+          <div style="color:#B7AB99">├── data/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#A99C88">EMR cohort + literature</span></div>
+          <div style="color:#B7AB99">└── docs/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#A99C88">how we built it</span></div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;gap:18px">
+          <div style="background:#FFFFFF;border:1px solid #E4DDD1;border-top:4px solid #0F7A6E;border-radius:4px 4px 14px 14px;padding:24px 28px;box-shadow:0 4px 18px rgba(15,122,110,.08)">
+            <div style="font-family:'Newsreader',serif;font-size:26px;color:#0A5A51;font-weight:600;line-height:1.2">The history of this folder is the revision map.</div>
+            <p style="color:#47535E;font-size:20px;line-height:1.5;margin:14px 0 0">Every capability the intern earns is a versioned file. Reading its git history reads its growth — like a trainee's transcript over a rotation.</p>
+          </div>
+          <div style="background:#F3EFE7;border:1px solid #E4DDD1;border-radius:14px;padding:22px 26px">
+            <div style="font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:12px">Learning vs. static</div>
+            <p style="color:#47535E;font-size:20px;line-height:1.5;margin:0">The only switch: <b style="color:#20272E">whether the mentor is allowed to write new capabilities here</b>. Nothing else changes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Demo · EPAs" data-screen-label="05 Demo" data-speaker-notes="After one project on TTR/ATTR amyloidosis it earned four capabilities and reached entrustment level 2 — direct supervision, one step up from observing." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:12px 150px 70px">
+      <div style="font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>After one project · TTR / ATTR amyloidosis</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:600;font-size:50px;line-height:1.1;letter-spacing:-.01em;margin:0 0 26px;max-width:26ch">It earned four capabilities and reached <em style="font-style:italic;color:#0F7A6E">entrustment level 2</em>.</h2>
+      <div style="display:flex;gap:40px;align-items:flex-start">
+        <div style="flex:1.4;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="background:#FFFFFF;border:1px solid #E4DDD1;border-radius:12px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:#0F7A6E;margin-top:9px;flex:none"></span><span style="font-weight:600;font-size:21px;line-height:1.3">Cohort assembly across coding systems<small style="display:block;color:#7A8791;font-weight:400;font-size:16px;margin-top:4px">spans ICD-9 and ICD-10</small></span></div>
+          <div style="background:#FFFFFF;border:1px solid #E4DDD1;border-radius:12px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:#0F7A6E;margin-top:9px;flex:none"></span><span style="font-weight:600;font-size:21px;line-height:1.3">Phenotype classification by code family<small style="display:block;color:#7A8791;font-weight:400;font-size:16px;margin-top:4px">cardiac vs. neuropathic</small></span></div>
+          <div style="background:#FFFFFF;border:1px solid #E4DDD1;border-radius:12px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:#0F7A6E;margin-top:9px;flex:none"></span><span style="font-weight:600;font-size:21px;line-height:1.3">Citation integrity<small style="display:block;color:#7A8791;font-weight:400;font-size:16px;margin-top:4px">flags claims needing a live source</small></span></div>
+          <div style="background:#FFFFFF;border:1px solid #E4DDD1;border-radius:12px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:#0F7A6E;margin-top:9px;flex:none"></span><span style="font-weight:600;font-size:21px;line-height:1.3">Bias &amp; assumption documentation<small style="display:block;color:#7A8791;font-weight:400;font-size:16px;margin-top:4px">names ascertainment caveats</small></span></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column-reverse;gap:9px">
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px;border-radius:10px;border:1px solid #E4DDD1;background:#FFFFFF;color:#7A8791;font-size:19px"><span style="font-family:'Newsreader',serif;font-weight:600;width:1.6rem;color:#7A8791">5</span> Supervises others</div>
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px;border-radius:10px;border:1px solid #E4DDD1;background:#FFFFFF;color:#7A8791;font-size:19px"><span style="font-family:'Newsreader',serif;font-weight:600;width:1.6rem;color:#7A8791">4</span> Independent</div>
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px;border-radius:10px;border:1px solid #E4DDD1;background:#FFFFFF;color:#7A8791;font-size:19px"><span style="font-family:'Newsreader',serif;font-weight:600;width:1.6rem;color:#7A8791">3</span> Indirect supervision</div>
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px;border-radius:10px;border:1px solid #0F7A6E;background:#E6F1EE;color:#0A5A51;font-size:19px;font-weight:600;box-shadow:0 4px 18px rgba(15,122,110,.18)"><span style="font-family:'Newsreader',serif;font-weight:600;width:1.6rem;color:#0F7A6E">2</span> Direct supervision <span style="margin-left:auto;font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:#0F7A6E;font-weight:700">reached</span></div>
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px;border-radius:10px;border:1px solid #0F7A6E;background:#E6F1EE;color:#0A5A51;font-size:19px"><span style="font-family:'Newsreader',serif;font-weight:600;width:1.6rem;color:#0F7A6E">1</span> Observes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Finding" data-screen-label="06 Finding" data-speaker-notes="And it noticed something: 41 patients coded under legacy ICD-9 277.3x instead of the current E85.x, so a naive amyloidosis filter would have silently missed them. It flagged it, corrected the cohort, and wrote the lesson back as a lasting capability." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 150px 110px">
+      <div style="font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:30px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>And it noticed something</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:600;font-size:56px;line-height:1.1;letter-spacing:-.01em;margin:0 0 30px;max-width:24ch">An intern that catches a coding error — and remembers it.</h2>
+      <div style="background:#FFFFFF;border:1px solid #E4DDD1;border-top:4px solid #B9852F;border-radius:4px 4px 16px 16px;padding:34px 40px;max-width:900px;box-shadow:0 6px 24px rgba(32,39,46,.06)">
+        <div style="font-family:'Newsreader',serif;font-size:64px;color:#B9852F;font-weight:600;line-height:1;font-variant-numeric:tabular-nums">41 patients</div>
+        <p style="color:#47535E;line-height:1.6;font-size:28px;margin:18px 0 0">coded under legacy ICD-9 <code style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;background:#F3EFE7;color:#C0574E;padding:2px 8px;border-radius:5px;font-size:.85em">277.3x</code> instead of the current <code style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;background:#F3EFE7;color:#C0574E;padding:2px 8px;border-radius:5px;font-size:.85em">E85.x</code> — so a naïve amyloidosis filter would have <b style="color:#20272E">silently missed them</b>. The scholar flagged it, corrected the cohort, and wrote the lesson back as a lasting capability.</p>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Why it matters" data-screen-label="07 Why" data-speaker-notes="EPAs turn 'the model is capable' into a credential you can entrust — the foundation of trust in medicine. This July students, residents and fellows join to shape the next projects, and a secure API arm keeps every experiment inside a controlled environment." style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:#FBF9F5;color:#20272E;font-family:'Inter',system-ui,sans-serif;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:36px 150px 0;flex:none">
+      <span style="font-family:'Newsreader',serif;font-weight:600;color:#0A5A51;font-size:22px">Evolving<span style="color:#C0574E">Scholar</span></span>
+      <span style="color:#7A8791;text-transform:uppercase;letter-spacing:.16em;font-size:14px">Clinical genetics · AI as a learner</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 150px 110px">
+      <div style="font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#C0574E;font-weight:600;margin-bottom:30px;display:flex;align-items:center;gap:16px"><span style="width:34px;height:2px;background:#C0574E"></span>Why it matters</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:600;font-size:56px;line-height:1.1;letter-spacing:-.01em;margin:0 0 40px;max-width:24ch">Competence you can <em style="font-style:italic;color:#0F7A6E">trust</em>, built the way clinicians build it.</h2>
+      <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:24px;max-width:1000px">
+        <li style="display:flex;gap:20px;align-items:baseline;color:#47535E;line-height:1.5;font-size:28px"><span style="width:9px;height:9px;border-radius:50%;background:#C0574E;flex:none;transform:translateY(-.15em)"></span><span>EPAs turn "the model is capable" into <b style="color:#20272E">a credential you can entrust</b> — the foundation of trust in medicine.</span></li>
+        <li style="display:flex;gap:20px;align-items:baseline;color:#47535E;line-height:1.5;font-size:28px"><span style="width:9px;height:9px;border-radius:50%;background:#C0574E;flex:none;transform:translateY(-.15em)"></span><span>This July: students, residents &amp; fellows join to shape the next projects.</span></li>
+        <li style="display:flex;gap:20px;align-items:baseline;color:#47535E;line-height:1.5;font-size:28px"><span style="width:9px;height:9px;border-radius:50%;background:#C0574E;flex:none;transform:translateY(-.15em)"></span><span>A secure API arm keeps every experiment inside a <b style="color:#20272E">controlled environment</b> — no real PHI leaves it.</span></li>
+      </ul>
+      <p style="color:#7A8791;font-size:24px;margin-top:44px;max-width:52ch;line-height:1.5">A first step toward a self-taught clinical molecular geneticist — one that learns from experience, and from failure.</p>
+    </div>
+  </section>
+
+</x-import>
+</x-dc>
+</body>
+</html>
