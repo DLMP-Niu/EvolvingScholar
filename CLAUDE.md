@@ -4,15 +4,17 @@
 
 ## What this project is
 
-EvolvingScholar studies how an AI research intern's **questioning and disease conceptualization evolve** across sequential gene–disease projects, under mentor (PI) guidance. Architecture: three nested loops (A: research activity · B: PI feedback · C: system update). The intern's growth lives in versioned artifacts under `scholar_core/`, never in a growing prompt.
+EvolvingScholar studies how an AI research intern's **questioning and disease conceptualization evolve** across sequential gene–disease projects, under mentor (PI) guidance. Architecture: three nested loops (A: research activity · B: PI feedback · C: system update). The intern's growth lives in versioned artifacts under its `core/` (`scholars/<id>/core/`), never in a growing prompt.
 
 ## Hard invariant
 
-**Growth is not prompt accumulation.** Do not attempt to make the intern "improve" by appending to its context or system prompt across cycles. All cross-project change is written as typed, versioned artifacts in `scholar_core/` by Loop C. See `docs/adr/0001-growth-is-not-prompt-accumulation.md`.
+**Growth is not prompt accumulation.** Do not attempt to make the intern "improve" by appending to its context or system prompt across runs. All cross-project change is written as typed, versioned artifacts in the scholar's `core/` by Loop C. See `docs/adr/0001-growth-is-not-prompt-accumulation.md`.
 
 ## Where things are
 
-- `scholar_core/` — the intern's evolving state (persona, goals, strategy, concept_model, capabilities, knowledge, ledger).
-- `harness/` — PI mentor, Loop C updater, evaluator (shared machinery, not the intern).
-- `runtime/` — orchestration entrypoint(s).
+- `scholars/<id>/` — the two evolving scholars (`sdk`, `api`); each holds its `engine.py`, `core/`, and `runs/`.
+- `scholars/<id>/core/` — that scholar's evolving state (goals, strategy, concept_model, capabilities, knowledge, ledger). Written by Loop C.
+- `harness/` — PI mentor (Loop B), Loop C updater, evaluator (shared machinery, not the intern).
+- `common/` — shared SDK-free primitives (capture, emr_tools, prompts, projects, persona.md).
+- `data/`, `schemas/` — the shared dataset and record schemas.
 - `docs/` — the build record (design log, ADRs, structure). Dev-facing.
