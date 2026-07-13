@@ -16,7 +16,66 @@ An AI "research intern" (the **Scholar**) that learns the way a real trainee doe
 - **Loop B — Intern ↔ PI** (middle): structured mentor feedback at checkpoints.
 - **Loop C — System update** (outer): rewrites the intern's **external, typed, versioned artifacts** between projects.
 
-> **Design invariant — growth is NOT prompt accumulation.** The intern does not evolve by growing an ever-longer prompt. Cross-project growth happens only through updates to versioned artifacts in [`scholar_core/`](scholar_core/), so "the intern evolved" is a legible git diff — not a swelling context window. See [ADR-0001](docs/adr/0001-growth-is-not-prompt-accumulation.md).
+> **Design invariant — growth is NOT prompt accumulation.** The intern does not evolve by growing an ever-longer prompt. Cross-project growth happens only through updates to versioned artifacts under each scholar's [`core/`](scholars/), so "the intern evolved" is a legible git diff — not a swelling context window. See [ADR-0001](docs/adr/0001-growth-is-not-prompt-accumulation.md).
+
+### Workflow
+
+```mermaid
+flowchart TB
+    IN["Gene–disease project<br/>seed questions · synthetic EMR cohort · literature"]
+
+    subgraph A["Loop A · Research  (inner)"]
+      A1["Raise and pursue questions<br/>literature review + EMR analysis"]
+      A2["Findings · report<br/>+ new, higher-rung questions"]
+      A1 --> A2
+    end
+
+    subgraph B["Loop B · Intern ↔ PI  (middle)"]
+      B1["Structured rubric feedback<br/>scores · directives · tasks"]
+      B2["Entrustment level (1 → 5)"]
+      B1 --> B2
+    end
+
+    subgraph C["Loop C · System update  (outer — the research contribution)"]
+      C1["Write typed, versioned artifacts<br/>only when gated by feedback"]
+      CORE["core/<br/>capabilities = EPAs · knowledge<br/>strategy · goals · guardrails"]
+      C1 --> CORE
+    end
+
+    IN --> A1
+    A2 --> B1
+    B1 -.->|"needs_more: new tasks"| A1
+    B2 --> C1
+    CORE ==>|"carried into the next run — growth is a diff, not a bigger prompt"| IN
+
+    CORE --> LADDER["Core EPA growth mimics a human trainee<br/>observe → assist → act independently → supervise others"]
+
+    subgraph FUT["Future aims"]
+      F1["Compare EPA growth<br/>Scholar 1 (SDK) vs Scholar 2 (API)"]
+      F2["Characterize the spread of<br/>AI self-learning behavior"]
+    end
+    LADDER -.->|"read out per scholar"| F1
+    LADDER -.-> F2
+
+    classDef a fill:#e9f1ff,stroke:#3b6fd4,color:#12213f;
+    classDef b fill:#fff3df,stroke:#c98a1e,color:#3a2a08;
+    classDef c fill:#e9f8ef,stroke:#2f9e5f,color:#0c3320;
+    classDef core fill:#c9edd6,stroke:#1f8a4c,stroke-width:2px,color:#0c3320;
+    classDef ladder fill:#fdf1c4,stroke:#c99a1e,stroke-width:2px,color:#3a2e05;
+    classDef fut fill:#eef0f4,stroke:#9aa2b1,color:#2a2f3a;
+    classDef io fill:#ffffff,stroke:#6b7280,color:#1f2430;
+    class A1,A2 a;
+    class B1,B2 b;
+    class C1 c;
+    class CORE core;
+    class LADDER ladder;
+    class F1,F2 fut;
+    class IN io;
+```
+
+- **Loop A → B → C is one experiment run.** Loop B may return `needs_more` (new PI tasks) for a partial re-run before it completes.
+- **The green path is the contribution:** Loop C writes the earned EPAs into `core/capabilities/`, which are carried into the next run — the growth curve *is* the git diff.
+- **The gold node is the human-learner analogy:** EPAs accrue along the clinical entrustment ladder (observe → independent → supervise), the same scaffold a trainee climbs.
 
 ## What evolves — the evolution stack
 
