@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" data-themes="academic-paper,swiss-grid,minimal-white,corporate-clean">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EvolvingScholar — combined deck</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" id="theme-link" href="assets/themes/academic-paper.css">
+<link rel="stylesheet" href="assets/animations/animations.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ---- blueprint "technical exhibit" island (fixed palette) ---- */
+  .bp{background:#0b3a6f;color:#e8f3ff;border-radius:6px;padding:32px 42px;
+      font-family:'JetBrains Mono','IBM Plex Mono',SFMono-Regular,Menlo,monospace;
+      background-image:linear-gradient(rgba(190,220,255,.09) 1px,transparent 1px),
+                       linear-gradient(90deg,rgba(190,220,255,.09) 1px,transparent 1px);
+      background-size:28px 28px}
+  .bp .row{display:flex;align-items:stretch;justify-content:center;gap:0}
+  .bp .node{flex:1;min-width:0;border:1.5px solid rgba(190,220,255,.5);border-radius:4px;
+      padding:14px 12px;text-align:center;background:rgba(255,255,255,.05)}
+  .bp .node.hi{border-color:#8ef0a6;background:rgba(142,240,166,.08)}
+  .bp .tag{color:#aee1ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+  .bp .node.hi .tag{color:#8ef0a6}
+  .bp .ti{font-weight:700;font-size:18px;margin:6px 0 3px;color:#fff}
+  .bp .ds{color:#b8d4f0;font-size:12px;line-height:1.35}
+  .bp .ar{align-self:center;color:#aee1ff;font-size:22px;padding:0 10px;flex:none}
+  /* per-loop artifact row (working context / rubric / core) */
+  .bp .sub{display:flex;gap:0;margin-top:8px}
+  .bp .sub .cell{flex:1;text-align:center;font-size:11px;color:#7da8cf;padding:0 8px}
+  .bp .sub .cell b{display:block;color:#cfe4fb;font-size:11.5px}
+  .bp .sub .cell.core b{color:#8ef0a6}
+  .bp .sub .cell.gone b{color:#ff9db0}
+  .bp .fb{margin:12px 60px 0;border:1.5px solid rgba(190,220,255,.4);border-top:0;
+      border-radius:0 0 10px 10px;height:30px;position:relative}
+  .bp .fb::before{content:"";position:absolute;left:-6px;top:-1px;transform:translateY(-100%);
+      border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #8ef0a6}
+  .bp .fb .lbl{position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);
+      background:#0b3a6f;padding:0 14px;color:#8ef0a6;font-size:12px;white-space:nowrap}
+  /* two starting points */
+  .bp .harness{border:1.5px solid #aee1ff;border-radius:4px;padding:14px;text-align:center;
+      background:rgba(174,225,255,.08);width:200px;flex:none;align-self:center}
+  .bp .lane{display:flex;flex-direction:column;gap:12px;flex:1}
+  .bp .sc{display:flex;align-items:center;gap:12px;border:1.5px solid rgba(190,220,255,.5);
+      border-radius:4px;padding:12px 16px;background:rgba(255,255,255,.05)}
+  .bp .sc .core{margin-left:auto;color:#7da8cf;font-size:11.5px}
+  .bp .warm{color:#ffd27a}
+  /* transfer (two loops) */
+  .bp .proj{flex:1;border:1.5px solid rgba(190,220,255,.5);border-radius:4px;padding:14px 14px;
+      background:rgba(255,255,255,.05);text-align:center}
+  .bp .proj.b{border-style:dashed}
+  .bp .proj .lp{color:#aee1ff;font-size:12px;letter-spacing:.08em}
+  .bp .epachips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+  .bp .chip{border:1px solid #8ef0a6;color:#cffbe0;border-radius:16px;padding:2px 9px;font-size:10.5px}
+  .bp .xfer{align-self:center;flex:none;width:150px;text-align:center;color:#8ef0a6}
+  .bp .xfer .big{font-size:22px}.bp .xfer .sm{font-size:11.5px;line-height:1.4;color:#cfe4fb}
+  .bp .vf{display:flex;flex-direction:column;gap:8px}
+  .bp .vnode{border:1.5px solid rgba(190,220,255,.5);border-radius:4px;padding:12px 14px;background:rgba(255,255,255,.05);text-align:center}
+  .bp .vnode.b{border-style:dashed}
+  .bp .vnode.epa{border-color:#8ef0a6;background:rgba(142,240,166,.08)}
+  .bp .vnode .lp{color:#aee1ff;font-size:12px;letter-spacing:.06em}
+  .bp .vdown{text-align:center;color:#8ef0a6;font-size:18px;line-height:1}
+  .figcap{font-family:var(--font-mono);color:var(--text-2);font-size:15px;margin-top:20px;text-align:center}
+
+  /* ---- EPA / ladder / stat (theme tokens) ---- */
+  .ladder{display:flex;flex-direction:column;gap:5px}
+  .rung{display:flex;align-items:center;gap:14px;border:1px solid var(--border);border-radius:var(--radius);
+      padding:8px 14px;color:var(--text-3);font-size:15px}
+  .rung .lv{font-weight:700;width:1.4rem;text-align:center}
+  .rung.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .rung .rr{margin-left:auto;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .stat-big{font-size:112px;line-height:.95;font-weight:800;color:var(--accent-3);font-variant-numeric:tabular-nums}
+  code.tok{font-family:var(--font-mono);background:var(--surface-2);color:var(--accent-3);padding:2px 8px;border-radius:3px;font-size:.85em}
+  /* finding -> EPA flow */
+  .finflow{display:flex;align-items:stretch;gap:0}
+  .finflow .st{flex:1;min-width:0;padding:16px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+  .finflow .st .n{font-family:var(--font-mono);font-size:11px;color:var(--text-3);letter-spacing:.1em}
+  .finflow .st b{display:block;font-size:16px;margin:6px 0}
+  .finflow .st small{color:var(--text-3);font-size:12.5px;line-height:1.4;display:block}
+  .finflow .ar{align-self:center;color:var(--text-3);font-size:20px;padding:0 8px;flex:none}
+  .finflow .st.epa{flex:1.4;border-color:var(--good);border-width:2px;background:rgba(26,90,42,.06)}
+  .finflow .st.epa .n{color:var(--good)}
+  .finflow .st.epa .epaname{display:block;font-weight:700;font-size:16px;color:var(--good);margin:6px 0}
+  ul.tight{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:14px}
+  ul.tight li{display:flex;gap:16px;align-items:flex-start;font-size:20px;line-height:1.5}
+  ul.tight li::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none;margin-top:.5em}
+  /* now -> next -> goal */
+  .nn{display:flex;align-items:stretch;gap:0}
+  .nn .col{flex:1;padding:0 26px}
+  .nn .col+.col{border-left:1px solid var(--border)}
+  .nn .lab{font-family:var(--font-mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .nn .col.goal .lab{color:var(--accent-3)}
+  .nn h4{margin:12px 0 10px}
+  .nn p{color:var(--text-2);font-size:15.5px;line-height:1.5;margin:0}
+  .nn .ar{align-self:center;color:var(--text-3);font-size:22px;padding:0 4px}
+</style>
+</head>
+<body class="tpl-presenter-mode-reveal">
+<div class="deck">
+
+  <!-- ============ 1 · COVER ============ -->
+  <section class="slide" data-title="Cover">
+    <p class="kicker">EvolvingScholar · guided self-evolution</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">An <span class="accent">AI Scholar Agent</span> that evolves by mimicking a human learner.</h1>
+    <p class="lede mt-m">Its growth is recorded as <strong>EPAs</strong> — <em>Entrustable Professional Activities</em>, a framework for credentialing competence — which it learns to apply.</p>
+    <div class="deck-footer"><span class="mono">#clinical-genetics #self-evolving-agent</span><span class="slide-number" data-current="1" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 2 · THE QUESTION ============ -->
+  <section class="slide" data-title="The question">
+    <p class="kicker">the question, posed to a research intern on day one</p>
+    <h2 class="h2 serif">"Review five years of literature on gene A and disease B, and study <span class="accent">large real-world EMR cohorts</span> — how far toward true expertise will that take you?"</h2>
+    <p class="lede mt-l">How we learn — how the <strong>AI Scholar Agent</strong> evolves:</p>
+    <ul class="tight mt-m">
+      <li>Run the project across many <strong>classic clinical-genetics diseases</strong></li>
+      <li>Read the growth as a <strong>measurable trajectory</strong></li>
+      <li><em>Not</em> a claim of human-equivalent expertise</li>
+    </ul>
+    <div class="deck-footer"><span class="mono"></span><span class="slide-number" data-current="2" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 3 · THE IDEA ============ -->
+  <section class="slide" data-title="The idea">
+    <p class="kicker">the idea</p>
+    <h2 class="h2">It learns the way a <span class="accent">human learner</span> does.</h2>
+    <div class="grid g3" style="gap:24px;margin-top:44px">
+      <div class="card card-accent" style="padding:28px 30px"><h4>① Study</h4><p class="dim"><strong>Validate</strong> known knowledge · <strong>discover</strong> new insights — literature tested against a real EMR cohort.</p></div>
+      <div class="card card-accent" style="padding:28px 30px"><h4>② Rounds</h4><p class="dim"><strong>Method · result · questioning</strong> — presented to the PI, who gives structured feedback.</p></div>
+      <div class="card card-accent" style="padding:28px 30px"><h4>③ Grow</h4><p class="dim"><strong>Feedback + self-reflection</strong> distilled into <strong>EPAs</strong> for future studies.</p></div>
+    </div>
+    <p class="dim" style="margin-top:38px">The human-learning currency: <strong>EPAs · skills · knowledge · lessons learned.</strong></p>
+    <div class="deck-footer"><span class="mono"></span><span class="slide-number" data-current="3" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 4 · THE LOOP (enriched blueprint) ============ -->
+  <section class="slide" data-title="The loop">
+    <p class="kicker">how it works</p>
+    <h2 class="h2">The guided self-evolution loop</h2>
+    <div class="bp mt-l">
+      <div class="row">
+        <div class="node"><div class="tag">Loop A</div><div class="ti">Research</div><div class="ds">literature + EMR cohort; raises &amp; answers questions</div></div>
+        <div class="ar">→</div>
+        <div class="node"><div class="tag">Loop B</div><div class="ti">PI review</div><div class="ds">rubric feedback · entrustment level</div></div>
+        <div class="ar">→</div>
+        <div class="node hi"><div class="tag">Loop C</div><div class="ti">Evolve</div><div class="ds">writes EPAs — gated by feedback</div></div>
+      </div>
+      <div class="sub">
+        <div class="cell gone"><b>working context</b>in-run · discarded ✕</div>
+        <div class="cell"><b>review rubric</b>scores · directives</div>
+        <div class="cell core"><b>core/</b>typed · versioned · carried ✓</div>
+      </div>
+      <div class="fb"><span class="lbl">core/ carried into the next run</span></div>
+    </div>
+    <p class="figcap">growth = a diff to <span style="color:var(--accent)">core/capabilities/</span>, not a bigger prompt</p>
+    <div class="deck-footer"><span class="mono"></span><span class="slide-number" data-current="4" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 5 · TWO STARTING POINTS, BUILT FOR SCALE ============ -->
+  <section class="slide" data-title="Two starting points">
+    <p class="kicker">two starting points, one harness</p>
+    <h2 class="h2">Two starting points — <span class="accent">built for scale</span>.</h2>
+    <div class="bp mt-l">
+      <div class="row" style="gap:26px">
+        <div class="harness"><div class="tag">Harness · shared</div><div class="ti" style="font-size:16px;margin-top:8px">PI review · Loop C<br>evaluator</div></div>
+        <div class="lane">
+          <div class="sc"><b>Scholar 1 · SDK</b><span class="ds">rich-tool start — Agent SDK "super-intern"</span><span class="core">scholars/sdk/core</span></div>
+          <div class="sc"><b class="warm">Scholar 2 · API</b><span class="ds">minimal · secure start — raw Messages API</span><span class="core">scholars/api/core</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="figcap">independent stores · no cross-pollination — <span class="accent">ready for large-scale testing in a secure cloud environment, supporting more models</span></p>
+    <div class="deck-footer"><span class="mono"></span><span class="slide-number" data-current="5" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 6 · RUN → EPA → NEXT PROJECT (two-loop transfer) ============ -->
+  <section class="slide" data-title="Transfer">
+    <p class="kicker">the payoff · learning transfers</p>
+    <h2 class="h2">Learn EPAs in one project — <span class="accent">auto-apply in next</span>.</h2>
+    <div class="grid mt-l" style="grid-template-columns:1.15fr .95fr;gap:40px;align-items:center">
+      <div>
+        <img class="runimg" src="../run-scholar2-api.gif" alt="Replay of a Scholar 2 (API) run: research, PI review, evolution" style="width:100%">
+        <p class="figcap" style="margin-top:10px">a real run, replayed — Scholar 2 (API) on TTR / ATTR</p>
+      </div>
+      <div class="bp" style="padding:22px 24px">
+        <div class="vf">
+          <div class="vnode"><div class="lp">PROJECT A · TTR / ATTR</div><div class="ds">Loop A→B→C · run 1 · entrustment L2</div></div>
+          <div class="vdown">↓</div>
+          <div class="vnode epa"><div class="lp" style="color:#8ef0a6">EPAs → core/</div><div class="epachips"><span class="chip">cohort assembly</span><span class="chip">phenotype</span><span class="chip">citation</span><span class="chip">bias docs</span></div><div class="ds">auto-loaded · no re-teaching</div></div>
+          <div class="vdown">↓</div>
+          <div class="vnode b"><div class="lp">PROJECT B · next disease</div><div class="ds">starts from run 1's capabilities — faster, higher rung</div></div>
+        </div>
+      </div>
+    </div>
+    <p class="figcap" style="margin-top:18px">the question we measure: does experience on disease A make it better on disease B?</p>
+    <div class="deck-footer"><span class="mono"></span><span class="slide-number" data-current="6" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 7 · THE FINDING ============ -->
+  <section class="slide" data-title="The finding">
+    <p class="kicker">it caught something real</p>
+    <h2 class="h2">An unprompted catch, <span style="color:var(--good)">cataloged as an EPA</span>.</h2>
+    <div class="finflow mt-l">
+      <div class="st"><div class="n">01 · NOTICED</div><b>ICD-9 vs ICD-10</b><small>41 amyloidosis patients on legacy <code class="tok">277.3x</code>, not <code class="tok">E85.x</code></small></div>
+      <div class="ar">→</div>
+      <div class="st"><div class="n">02 · FLAGGED</div><b>Silent under-count</b><small>a naïve <code class="tok">E85</code> filter misses them</small></div>
+      <div class="ar">→</div>
+      <div class="st"><div class="n">03 · WRITTEN</div><b>Cohort corrected</b><small>lesson written back to <span class="mono">core/</span></small></div>
+      <div class="ar">→</div>
+      <div class="st"><div class="n">04 · REVIEWED</div><b>PI confirms</b><small>method validated at rounds</small></div>
+      <div class="ar">→</div>
+      <div class="st epa"><div class="n">05 · CATALOGED · EPA</div><span class="epaname">Cohort assembly across coding systems</span><small class="mono">cohort-assembly-cross-coding.md</small></div>
+    </div>
+    <p class="figcap">noticed → flagged → written → reviewed → a reusable <span style="color:var(--good)">EPA</span>, auto-loaded into the next project</p>
+    <div class="deck-footer"><span class="mono"></span><span class="slide-number" data-current="7" data-total="8"></span></div>
+    </section>
+
+  <!-- ============ 8 · NOW → NEXT → END GOAL ============ -->
+  <section class="slide" data-title="Now / Next / Goal">
+    <p class="kicker">summary · what's next</p>
+    <h2 class="h2">From a working demo to a <span class="accent">clinical expert</span>.</h2>
+    <div class="nn mt-l">
+      <div class="col"><div class="lab">Start Small</div><h4>A working demo</h4><p>The EvolvingScholar concept, running: guided, human-like learning with <strong>EPA tracking</strong> for an educational read on growth — and it's <strong>testing-ready</strong>.</p></div>
+      <div class="ar">→</div>
+      <div class="col"><div class="lab">Move Fast</div><h4>Scale the experiment</h4><p>A larger testing set — many more <strong>runs and projects</strong>, across diseases and models, in the secure cloud arm.</p></div>
+      <div class="ar">→</div>
+      <div class="col goal"><div class="lab">Think Big</div><h4>The learning path</h4><p>The captured <strong>evolving trace</strong> lets us analyze the learning path and capability toward an eventual <strong>clinical expert</strong>.</p></div>
+    </div>
+    <p class="lede tc mt-l">Learning from experience — and from failure.</p>
+    <div class="deck-footer"><span class="mono">thanks · Q&amp;A</span><span class="slide-number" data-current="8" data-total="8"></span></div>
+    </section>
+
+</div>
+
+<script src="assets/runtime.js"></script>
+</body>
+</html>
