@@ -93,7 +93,12 @@ Knowledge sits *below* this stack, saturated and roughly constant — everything
 
 ## Status
 
-**Design → scaffolding.** First gene–disease pair: **TTR / hereditary transthyretin amyloidosis (ATTR)**. Not yet implemented. See [`docs/design-notes.md`](docs/design-notes.md) for the running design log and [`docs/adr/`](docs/adr/) for decisions.
+**Working pilot — `v0.1.0`.** Both scholars are built and each has completed at least one full **A → B → C** run on the first project, **TTR / hereditary transthyretin amyloidosis (ATTR)** (cohort A):
+
+- **Scholar 1 (SDK)** — Claude Agent SDK, rich tools.
+- **Scholar 2 (API)** — raw Messages API, minimal tools; at run 1, entrustment **level 2**, with 4 earned EPAs.
+
+Loop A/B/C are implemented; the PI is **human-in-the-loop** (LLM-PI deferred). See [`docs/design-notes.md`](docs/design-notes.md) for the running log, [`docs/adr/`](docs/adr/) for decisions, and [`docs/demo/`](docs/demo/) for run-replay visuals.
 
 ## Repo map
 
