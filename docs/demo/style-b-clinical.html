@@ -1,0 +1,203 @@
+<title>EvolvingScholar — Clinical deck</title>
+<style>
+  :root{
+    --paper:#FBF9F5; --paper-2:#F3EFE7; --card:#FFFFFF;
+    --ink:#20272E; --ink-soft:#47535E; --muted:#7A8791;
+    --rule:#E4DDD1;
+    --teal:#0F7A6E; --teal-deep:#0A5A51; --teal-wash:#E6F1EE;
+    --clay:#C0574E; --gold:#B9852F;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  .deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;
+    padding:clamp(2rem,6vw,7.5rem);opacity:0}
+  .slide.active{display:flex;animation:fade .55s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+
+  .top{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;
+    padding:1.3rem clamp(2rem,6vw,7.5rem);z-index:5;font-size:.78rem;letter-spacing:.02em}
+  .top .mark{font-family:var(--serif);font-weight:600;color:var(--teal-deep);font-size:1rem;letter-spacing:0}
+  .top .mark span{color:var(--clay)}
+  .top .track{color:var(--muted);text-transform:uppercase;letter-spacing:.16em;font-size:.68rem}
+
+  .eyebrow{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--clay);
+    font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+  .eyebrow::before{content:"";width:30px;height:2px;background:var(--clay)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.5rem,6.5vw,5.2rem);line-height:1.04;
+    letter-spacing:-.015em;text-wrap:balance;margin-bottom:1.5rem;max-width:20ch}
+  h1 em{font-style:italic;color:var(--teal)}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.7rem,3.8vw,3rem);line-height:1.1;
+    letter-spacing:-.01em;text-wrap:balance;margin-bottom:1.5rem;max-width:22ch}
+  h2 em{font-style:italic;color:var(--teal)}
+  .lede{font-size:clamp(1.05rem,1.9vw,1.45rem);line-height:1.55;color:var(--ink-soft);max-width:58ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .quote{font-family:var(--serif);font-style:italic;font-size:clamp(1.3rem,2.6vw,2.1rem);
+    line-height:1.4;color:var(--ink);max-width:26ch;border-left:3px solid var(--teal);
+    padding-left:1.6rem;margin:.3rem 0}
+  .attrib{color:var(--muted);font-size:.95rem;margin-top:1.4rem;font-style:normal}
+  .note{color:var(--muted);font-size:.9rem;margin-top:2.2rem;max-width:52ch;line-height:1.5}
+  .note b{color:var(--teal-deep)}
+
+  /* pipeline */
+  .flow{display:flex;align-items:stretch;gap:.7rem;margin-top:.4rem;flex-wrap:wrap;max-width:1000px}
+  .step{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:1.2rem 1.3rem;
+    flex:1;min-width:150px;box-shadow:0 1px 2px rgba(32,39,46,.04)}
+  .step .i{font-family:var(--serif);font-size:1.1rem;color:var(--teal);font-weight:600}
+  .step .t{font-weight:600;margin:.5rem 0 .3rem;font-size:1.02rem}
+  .step p{color:var(--muted);font-size:.86rem;line-height:1.45}
+  .arrowto{align-self:center;color:var(--rule);font-size:1.3rem}
+
+  /* ladder */
+  .ladder{display:flex;flex-direction:column-reverse;gap:.5rem;max-width:640px;margin-top:.4rem}
+  .rung{display:flex;align-items:center;gap:1.1rem;padding:.7rem 1.1rem;border-radius:10px;
+    border:1px solid var(--rule);background:var(--card);color:var(--muted);font-size:.98rem}
+  .rung .lv{font-family:var(--serif);font-weight:600;width:1.6rem;color:var(--muted)}
+  .rung.reached{background:var(--teal-wash);border-color:var(--teal);color:var(--teal-deep)}
+  .rung.reached .lv{color:var(--teal)}
+  .rung.here{box-shadow:0 4px 18px rgba(15,122,110,.18);font-weight:600}
+  .rung .badge{margin-left:auto;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--teal);font-weight:700}
+
+  /* EPA cards */
+  .epas{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;max-width:820px;margin-top:.3rem}
+  .epa{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:1rem 1.2rem;
+    display:flex;gap:.9rem;align-items:flex-start}
+  .epa .dot{width:9px;height:9px;border-radius:50%;background:var(--teal);margin-top:.5rem;flex:none}
+  .epa .n{font-weight:600;font-size:1rem;line-height:1.3}
+  .epa .n small{display:block;color:var(--muted);font-weight:400;font-size:.82rem;margin-top:.2rem}
+
+  .finding{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--gold);
+    border-radius:4px 4px 14px 14px;padding:1.6rem 1.8rem;max-width:720px;margin-top:.6rem;
+    box-shadow:0 6px 24px rgba(32,39,46,.06)}
+  .finding .big{font-family:var(--serif);font-size:clamp(2.4rem,5vw,3.6rem);color:var(--gold);
+    font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+  .finding p{color:var(--ink-soft);line-height:1.6;font-size:1.08rem;margin-top:.8rem}
+  .finding code{font-family:var(--mono);background:var(--paper-2);color:var(--clay);
+    padding:.1rem .4rem;border-radius:4px;font-size:.88em}
+
+  ul.why{list-style:none;margin-top:1rem;display:flex;flex-direction:column;gap:1rem;max-width:680px}
+  ul.why li{display:flex;gap:1rem;align-items:baseline;color:var(--ink-soft);line-height:1.5;font-size:1.08rem}
+  ul.why li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--clay);flex:none;transform:translateY(.5em)}
+  ul.why b{color:var(--ink)}
+
+  .nav{position:fixed;bottom:1.7rem;right:clamp(2rem,6vw,7.5rem);display:flex;gap:.5rem;z-index:6}
+  .nav button{width:9px;height:9px;border-radius:50%;background:var(--rule);cursor:pointer;
+    transition:.25s;border:0;padding:0}
+  .nav button.on{background:var(--teal);width:26px;border-radius:5px}
+  .count{position:fixed;bottom:1.6rem;left:clamp(2rem,6vw,7.5rem);font-family:var(--serif);
+    color:var(--muted);font-size:.95rem;z-index:6}
+  .count b{color:var(--teal-deep)}
+  .hint{position:fixed;bottom:1.6rem;left:50%;transform:translateX(-50%);color:var(--muted);
+    font-size:.72rem;letter-spacing:.08em;z-index:6;opacity:.6}
+</style>
+
+<div class="top">
+  <span class="mark">Evolving<span>Scholar</span></span>
+  <span class="track">Clinical genetics · AI as a learner</span>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 1 HOOK -->
+  <section class="slide active">
+    <div class="eyebrow">A question for a trainee</div>
+    <h1>Can an AI intern climb the <em>same competency ladder</em> a clinician does?</h1>
+    <p class="lede">EvolvingScholar is an AI research intern that learns the way a trainee does — guided by a mentor, project by project — and we can <b>measure how far up the ladder it climbs</b>.</p>
+  </section>
+
+  <!-- 2 PREMISE -->
+  <section class="slide">
+    <div class="eyebrow">Where this started</div>
+    <div class="quote">"Review five years of literature on gene A and disease B, and study the largest US patient cohort. How far toward true expertise does that take you?"</div>
+    <p class="attrib">— the question posed to a real research intern, on day one</p>
+    <p class="note">EvolvingScholar lets us run that project quickly across many classic clinical-genetics diseases — and read the growth as a <b>trajectory, not a claim</b> of human-equivalent expertise.</p>
+  </section>
+
+  <!-- 3 HOW -->
+  <section class="slide">
+    <div class="eyebrow">How it learns</div>
+    <h2>Literature to real-world cohort — then a mentor weighs in.</h2>
+    <div class="flow">
+      <div class="step"><div class="i">Study</div><div class="t">Research</div><p>Reviews the literature, then tests it against a real EMR patient cohort.</p></div>
+      <span class="arrowto">→</span>
+      <div class="step"><div class="i">Rounds</div><div class="t">PI feedback</div><p>A mentor reviews the work and assigns an entrustment level.</p></div>
+      <span class="arrowto">→</span>
+      <div class="step"><div class="i">Grow</div><div class="t">Evolve</div><p>Earns new <b style="color:var(--teal)">EPAs</b> — capabilities it carries into the next project.</p></div>
+    </div>
+    <p class="note"><b>EPA</b> — Entrustable Professional Activity: a unit of clinical work a trainee can be trusted to perform. It is how real competence is credentialed in medicine.</p>
+  </section>
+
+  <!-- 4 DEMO -->
+  <section class="slide">
+    <div class="eyebrow">After one project · TTR / ATTR amyloidosis</div>
+    <h2>It earned four capabilities and reached <em>entrustment level 2</em>.</h2>
+    <div class="epas">
+      <div class="epa"><span class="dot"></span><span class="n">Cohort assembly across coding systems<small>builds a patient cohort spanning ICD-9 and ICD-10</small></span></div>
+      <div class="epa"><span class="dot"></span><span class="n">Phenotype classification by code family<small>groups diagnoses into cardiac vs. neuropathic</small></span></div>
+      <div class="epa"><span class="dot"></span><span class="n">Citation integrity<small>flags any claim a live source would need to verify</small></span></div>
+      <div class="epa"><span class="dot"></span><span class="n">Bias & assumption documentation<small>names ascertainment and triage caveats</small></span></div>
+    </div>
+    <div class="ladder" style="margin-top:1.4rem">
+      <div class="rung"><span class="lv">5</span> Supervises others</div>
+      <div class="rung"><span class="lv">4</span> Independent</div>
+      <div class="rung"><span class="lv">3</span> Indirect supervision</div>
+      <div class="rung reached here"><span class="lv">2</span> Direct supervision <span class="badge">reached</span></div>
+      <div class="rung reached"><span class="lv">1</span> Observes</div>
+    </div>
+  </section>
+
+  <!-- 5 FINDING -->
+  <section class="slide">
+    <div class="eyebrow">And it noticed something</div>
+    <h2>An intern that catches a coding error — and remembers it.</h2>
+    <div class="finding">
+      <div class="big">41 patients</div>
+      <p>coded under legacy ICD-9 <code>277.3x</code> instead of the current <code>E85.x</code> — so a naïve amyloidosis filter would have <b>silently missed them</b>. The scholar flagged it, corrected the cohort, and wrote the lesson back as a lasting capability.</p>
+    </div>
+  </section>
+
+  <!-- 6 WHY -->
+  <section class="slide">
+    <div class="eyebrow">Why it matters</div>
+    <h2>Competence you can <em>trust</em>, built the way clinicians build it.</h2>
+    <ul class="why">
+      <li>EPAs turn "the model is capable" into <b>a credential you can entrust</b> — the foundation of trust in medicine.</li>
+      <li>This July: students, residents & fellows join to shape the next projects.</li>
+      <li>A secure API arm keeps every experiment inside a <b>controlled environment</b> — no real PHI leaves it.</li>
+    </ul>
+    <p class="note">A first step toward a self-taught clinical molecular geneticist — one that learns from experience, and from failure.</p>
+  </section>
+
+</div>
+
+<div class="count"><b id="cur">1</b> &nbsp;/&nbsp; 6</div>
+<div class="hint">← → to navigate</div>
+<div class="nav" id="nav"></div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const nav=document.getElementById('nav');
+  const cur=document.getElementById('cur');
+  let i=0;
+  slides.forEach((_,n)=>{const b=document.createElement('button');b.onclick=()=>go(n);nav.appendChild(b);});
+  const dots=[...nav.children];
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+    cur.textContent=i+1;
+  }
+  addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);
+  });
+  go(0);
+</script>
